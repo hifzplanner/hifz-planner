@@ -229,6 +229,14 @@ function toggle(kind){
   if(kind==='manzil'){if(c.manzil&&state.pool&&state.pool.length)state.ptr=c.ticks.manzil?c.manzil.end:c.manzil.start}
   setHistory(c);save()}
 
+/* ---------- restart ---------- */
+function knownToBase(known){const b={};for(let n=1;n<=114;n++){const k=known[n];if(k.every(Boolean)){b[n]='all';continue}const r=[];let i=1;while(i<=k.length){if(!k[i-1]){i++;continue}let j=i;while(j+1<=k.length&&k[j])j++;r.push(i===j?''+i:i+'-'+j);i=j+1}if(r.length)b[n]=r.join(', ')}return b}
+function restartJourney(keepLearned){
+  if(keepLearned)state.base=knownToBase(computeKnown(state.base,state.log).known);
+  state.log=[];state.history={};state.conf={};state.revised={};state.pool=null;state.ptr=0;state.card=null;state.restOverride={};state.startDate=todayIso();cache=null;tab='today';save()}
+let deferredInstall=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;if(tab==='set'&&!draft)render()});
+
 /* ---------- estimates ---------- */
 function plan(){const key=JSON.stringify([state.base,state.settings,state.log.length,state.startDate]);if(cache&&cacheKey===key)return cache;
   const all=genLessons(state,1e9);const t=new Date();let d=new Date(t.getFullYear(),t.getMonth(),t.getDate());
@@ -357,8 +365,11 @@ function viewSettings(){
   const s=state.settings;
   return `<div class="card"><h2>Settings</h2><button data-a="editsetup" style="width:100%">Edit memorized surahs, order and pace</button>
   <label>Appearance</label><select data-a="theme"><option value="auto" ${s.theme==='auto'?'selected':''}>Match my phone</option><option value="light" ${s.theme==='light'?'selected':''}>Light</option><option value="dark" ${s.theme==='dark'?'selected':''}>Dark</option></select></div>
-  <div class="card"><h2>Share with friends</h2><p class="mut">Everyone gets their own private plan on their own device.</p><button data-a="share">Share this app</button> <button data-a="install">How to install on my phone</button><div id="installhelp" class="mut hidden" style="margin-top:8px"><b>iPhone:</b> open in Safari → Share → Add to Home Screen.<br><b>Android:</b> open in Chrome → ⋮ menu → Add to Home screen / Install app.</div></div>
+  <div class="card"><h2>Share with friends</h2><p class="mut">Everyone gets their own private plan on their own device.</p><button data-a="share">Share this app</button> <button data-a="install">${deferredInstall?"Install app":"How to install on my phone"}</button><div id="installhelp" class="mut hidden" style="margin-top:8px"><b>iPhone:</b> open the link in Safari → Share button → Add to Home Screen. Do this <u>before</u> you set up, because the home-screen app keeps its data separately from Safari. (If you already set up in Safari, use Export backup in Safari, then Import backup in the home-screen app.)<br><b>Android:</b> open in Chrome → ⋮ menu → Install app (or Add to Home screen).</div></div>
   <div class="card"><h2>Backup</h2><p class="mut">Your data lives only in this browser. Export a backup now and then, especially before clearing browser data or changing phone.</p><div class="row"><button data-a="export">Export backup</button><button data-a="import">Import backup</button><input type="file" id="file" accept="application/json" class="hidden"></div></div>
+  <div class="card"><h2>Start the journey again</h2><p class="mut">Want a fresh start? Your starting selection of memorized surahs and ayat is always kept. Your daily progress, streak and notes are cleared, and the plan starts again from today.</p>
+  <button data-a="restart1" style="width:100%">Restart: keep only my starting selection</button><div style="height:8px"></div>
+  <button data-a="restart2" style="width:100%">Restart: also count everything I learned here as memorized</button></div>
   <div class="card"><h2>Reset</h2><button data-a="reset" style="color:var(--bad)">Erase everything on this device</button></div>
   <div class="card mut">Word counts come from the Arabic text, so “pages” are estimates. Arabic text from api.alquran.cloud and audio from everyayah.com (Mishary Alafasy) are loaded only when you tap them.</div>`}
 
@@ -401,11 +412,13 @@ document.addEventListener('click',async ev=>{
       state.pool=null;state.ptr=0;state.log.forEach(e=>e.inPool=false);
       // pool rebuilt from base only: log entries older than 8 days will re-enter
       state.card=null;cache=null;draft=null;tab='today';save();break}
+    case 'restart1':if(!confirm('Restart from the beginning?\n\nKept: the surahs/ayat you selected as memorized at the start.\nCleared: lessons you learned in this app, streak and notes.\n\nTip: export a backup first if you want to keep a copy.'))return;restartJourney(false);break;
+    case 'restart2':if(!confirm('Restart with a new plan?\n\nEverything you learned in this app so far will be counted as memorized (together with your starting selection). Your streak and notes are cleared, and the plan starts again from today.'))return;restartJourney(true);break;
     case 'startnow':state.startDate=todayIso();state.card=null;cache=null;save();break;
     case 'cancelsetup':draft=null;break;
     case 'editsetup':draft=JSON.parse(JSON.stringify({base:state.base,settings:state.settings,name:state.name,startDate:state.startDate||todayIso()}));break;
     case 'share':{const u=location.href.split('#')[0];try{if(navigator.share){await navigator.share({title:'Hifz Planner',text:'A free daily Quran memorization planner',url:u});return}}catch(e){}try{await navigator.clipboard.writeText(u);alert('Link copied:\n'+u)}catch(e){prompt('Copy this link:',u)}return}
-    case 'install':$('#installhelp').classList.toggle('hidden');return;
+    case 'install':if(deferredInstall){deferredInstall.prompt();deferredInstall=null;return}$('#installhelp').classList.toggle('hidden');return;
     case 'export':{const b=new Blob([JSON.stringify(state)],{type:'application/json'});const a2=document.createElement('a');a2.href=URL.createObjectURL(b);a2.download='hifz-backup-'+todayIso()+'.json';a2.click();return}
     case 'import':$('#file').click();return;
     case 'reset':if(confirm('Erase all your hifz data on this device? This cannot be undone.')){localStorage.removeItem(LS);state=defState();draft=null;cache=null;tab='today'}else return;break;
