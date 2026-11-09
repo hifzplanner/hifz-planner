@@ -208,13 +208,14 @@ function takeManzil(){
 /* ---------- today's card ---------- */
 function makeCard(prev){
   const today=todayIso();ensurePool();
-  const rest=new Date().getDay()===state.settings.restDay&&!state.restOverride[today]&&state.settings.restDay>=0;
-  const card={date:today,rest,lesson:null,commit:null,ticks:{new:false,sabqi:false,manzil:false},sabqi:'',manzil:null};
+  const pre=!!(state.startDate&&today<state.startDate);
+  const rest=!pre&&new Date().getDay()===state.settings.restDay&&!state.restOverride[today]&&state.settings.restDay>=0;
+  const card={date:today,pre,rest,lesson:null,commit:null,ticks:{new:false,sabqi:false,manzil:false},sabqi:'',manzil:null};
   const recent=state.log.filter(e=>e.date!==today||(prev&&false)).slice(-7);
   card.sabqi=recent.length?rangesText(recent):'';
   if(prev&&prev.date===today){card.ticks.sabqi=prev.ticks.sabqi;card.ticks.manzil=prev.ticks.manzil;card.manzil=prev.manzil;card.sabqi=prev.sabqi}
   else{const m=takeManzil();card.manzil={text:fmtPool(m.items),pages:m.words/PG,start:m.start,end:m.end}}
-  if(!rest){const l=genLessons(state,1)[0];card.lesson=l||null}
+  if(!rest&&!pre){const l=genLessons(state,1)[0];card.lesson=l||null}
   return card}
 function currentCard(){const today=todayIso();if(!state.card||state.card.date!==today){state.card=makeCard(null);save()}return state.card}
 function setHistory(card){const h=state.history[card.date]||(state.history[card.date]={});h.sabqi=card.ticks.sabqi;h.manzil=card.ticks.manzil;h.new=card.ticks.new||h.new||false;if(card.lesson&&card.ticks.new)h.lesson=labelOf(card.lesson)}
@@ -229,8 +230,9 @@ function toggle(kind){
   setHistory(c);save()}
 
 /* ---------- estimates ---------- */
-function plan(){const key=JSON.stringify([state.base,state.settings,state.log.length]);if(cache&&cacheKey===key)return cache;
+function plan(){const key=JSON.stringify([state.base,state.settings,state.log.length,state.startDate]);if(cache&&cacheKey===key)return cache;
   const all=genLessons(state,1e9);const t=new Date();let d=new Date(t.getFullYear(),t.getMonth(),t.getDate());
+  if(state.startDate&&state.startDate>iso(d))d=fromIso(state.startDate);
   const c=state.card;if(c&&c.date===todayIso()&&c.commit)d=addDays(d,1);
   const rd=state.settings.restDay;const dates=[];
   for(let i=0;i<all.length;i++){while(d.getDay()===rd)d=addDays(d,1);dates.push(new Date(d));d=addDays(d,1)}
@@ -264,6 +266,9 @@ function streak(){let n=0,d=new Date();const hasDone=s=>{const h=state.history[s
 function viewToday(){
   const c=currentCard();const p=plan();const t=new Date();
   let h='';
+  if(c.pre){const days=Math.round((fromIso(state.startDate)-fromIso(c.date))/864e5);
+    h+=`<div class="card lesson"><h2>Get ready</h2><div class="big">Your plan starts on ${esc(fmtDate(fromIso(state.startDate)))}</div><p class="mut">${days} day${days>1?'s':''} to go. Until then, keep revising what you already know. Your first lesson will appear here on the start date.</p><button class="pri" data-a="startnow">Start today instead</button></div>`;
+    h+=revCards(c,false);return h}
   if(c.rest){
     const weak=Object.keys(state.conf).filter(n=>state.conf[n]==='weak').map(Number).sort((a,b)=>a-b);
     h+=`<div class="card"><h2>${DAYS[t.getDay()]} · rest day</h2><div class="big">No new lesson today</div><p class="mut">Spend your 30 minutes on revision: weak spots, and anything you missed this week.</p>
@@ -326,7 +331,7 @@ function viewProgress(){
   h+=`</div><div class="mut" style="margin-top:6px">Darker = more of the surah memorized.</div></div>`;
   return h}
 function setupForm(first){
-  const d=draft;const s=d.settings;const est=(()=>{const tmp=Object.assign({},state,{base:d.base,settings:s});const all=genLessons(tmp,1e9);let days=0,dd=new Date();for(let i=0;i<all.length;i++){while(dd.getDay()===s.restDay)dd=addDays(dd,1);dd=addDays(dd,1)}return{n:all.length,end:dd}})();
+  const d=draft;const s=d.settings;const est=(()=>{const tmp=Object.assign({},state,{base:d.base,settings:s});const all=genLessons(tmp,1e9);const dd0=(d.startDate&&d.startDate>todayIso())?d.startDate:todayIso();let dd=fromIso(dd0);for(let i=0;i<all.length;i++){while(dd.getDay()===s.restDay)dd=addDays(dd,1);dd=addDays(dd,1)}return{n:all.length,end:dd}})();
   let h='';
   if(first)h+=`<div class="card"><div class="big">Bismillah 🌙</div><p>A calm hifz plan for <b>30 minutes a day</b>: ~12 min new lesson, ~8 min recent, ~10 min old revision. Your progress is saved <b>only on this device</b>. No account needed.</p></div>`;
   h+=`<div class="card"><h2>1. What do you already know?</h2><div class="mut">Tick surahs you have fully memorized. For partial surahs, type the ayat, e.g. <i>1-20</i> or <i>1-10, 15</i>.</div>
@@ -339,6 +344,7 @@ function setupForm(first){
   <label>Lessons per day for the first weeks</label><select data-a="p1u"><option value="0.5" ${s.p1Units==0.5?'selected':''}>Half a lesson</option><option value="1" ${s.p1Units==1?'selected':''}>1 lesson</option><option value="1.5" ${s.p1Units==1.5?'selected':''}>1.5 lessons</option><option value="2" ${s.p1Units==2?'selected':''}>2 lessons</option></select>
   <label>How many weeks at that pace</label><input type="number" min="0" max="520" data-a="p1w" value="${s.p1Weeks}">
   <label>Lessons per day after that</label><select data-a="p2u"><option value="1" ${s.p2Units==1?'selected':''}>1 lesson</option><option value="1.5" ${s.p2Units==1.5?'selected':''}>1.5 lessons</option><option value="2" ${s.p2Units==2?'selected':''}>2 lessons</option><option value="3" ${s.p2Units==3?'selected':''}>3 lessons</option></select>
+  ${first||(d.startDate&&d.startDate>todayIso())?`<label>Start date (your first lesson)</label><input type="date" data-a="sdate" min="${todayIso()}" value="${d.startDate||todayIso()}">`:`<div class="mut" style="margin-top:10px">Your plan started on ${esc(fmtDate(fromIso(state.startDate||todayIso())))}.</div>`}
   <label>Rest day (no new lesson)</label><select data-a="rest"><option value="-1" ${s.restDay==-1?'selected':''}>None</option>${DAYS.map((x,i)=>`<option value="${i}" ${s.restDay==i?'selected':''}>${x}</option>`).join('')}</select>
   <label>Minutes for old revision (Manzil) each day</label><input type="number" min="5" max="60" data-a="mmin" value="${s.manzilMin}">
   <div class="est">${est.n} lessons to go · estimated finish ${esc(est.end.toLocaleDateString(undefined,{month:'long',year:'numeric'}))} (${esc(span(new Date(),est.end))})</div></div>`;
@@ -361,17 +367,17 @@ const TABS=[['today','☀️','Today'],['plan','🗓️','Plan'],['rev','🔁','
 function applyTheme(){const t=state.settings.theme;if(t==='auto')document.documentElement.removeAttribute('data-theme');else document.documentElement.setAttribute('data-theme',t)}
 function render(){
   applyTheme();const app=$('#app');
-  if(!state.setup){if(!draft)draft=JSON.parse(JSON.stringify({base:state.base,settings:state.settings,name:state.name}));app.innerHTML=setupForm(true);$('#nav').innerHTML='';$('#sub').textContent='Set up your plan';return}
+  if(!state.setup){if(!draft)draft=JSON.parse(JSON.stringify({base:state.base,settings:state.settings,name:state.name,startDate:state.startDate||todayIso()}));app.innerHTML=setupForm(true);$('#nav').innerHTML='';$('#sub').textContent='Set up your plan';return}
   $('#sub').textContent=(state.name?esc(state.name)+' · ':'')+new Date().toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long'});
   $('#nav').innerHTML=TABS.map(([k,i,t])=>`<button data-a="tab" data-v="${k}" class="${tab===k?'on':''}"><span class="ic">${i}</span>${t}</button>`).join('');
   const v={today:viewToday,plan:viewPlan,rev:viewRevision,prog:viewProgress,set:viewSettings}[tab];
   const y=window.scrollY;app.innerHTML=v();window.scrollTo(0,y)}
-function refreshEst(){const e=$('.est');if(!e||!draft)return;const s=draft.settings;const tmp=Object.assign({},state,{base:draft.base,settings:s});const all=genLessons(tmp,1e9);let dd=new Date();for(let i=0;i<all.length;i++){while(dd.getDay()===s.restDay)dd=addDays(dd,1);dd=addDays(dd,1)}
+function refreshEst(){const e=$('.est');if(!e||!draft)return;const s=draft.settings;const tmp=Object.assign({},state,{base:draft.base,settings:s});const all=genLessons(tmp,1e9);let dd=fromIso((draft.startDate&&draft.startDate>todayIso())?draft.startDate:todayIso());for(let i=0;i<all.length;i++){while(dd.getDay()===s.restDay)dd=addDays(dd,1);dd=addDays(dd,1)}
   e.textContent=all.length+' lessons to go · estimated finish '+dd.toLocaleDateString(undefined,{month:'long',year:'numeric'})+' ('+span(new Date(),dd)+')'}
 
 document.addEventListener('click',async ev=>{
   const t=ev.target.closest('[data-a]');if(!t)return;const a=t.dataset.a;
-  if(['mchk','mtxt','unit','p1u','p1w','p2u','rest','mmin','name','theme'].includes(a))return;
+  if(['mchk','mtxt','unit','p1u','p1w','p2u','rest','mmin','name','theme','sdate'].includes(a))return;
   const n=+t.dataset.n,v=t.dataset.v;
   switch(a){
     case 'tab':tab=v;stopAudio();window.scrollTo(0,0);break;
@@ -390,12 +396,14 @@ document.addEventListener('click',async ev=>{
     case 'order':draft.settings.order=v;keepScroll();return;
     case 'savesetup':{
       const first=!state.setup;state.base=draft.base;state.settings=draft.settings;state.name=draft.name||'';
-      if(first){state.setup=true;state.startDate=todayIso()}
+      if(first)state.setup=true;
+      if(first||(state.startDate&&state.startDate>todayIso()))state.startDate=(draft.startDate&&draft.startDate>=todayIso())?draft.startDate:todayIso();
       state.pool=null;state.ptr=0;state.log.forEach(e=>e.inPool=false);
       // pool rebuilt from base only: log entries older than 8 days will re-enter
       state.card=null;cache=null;draft=null;tab='today';save();break}
+    case 'startnow':state.startDate=todayIso();state.card=null;cache=null;save();break;
     case 'cancelsetup':draft=null;break;
-    case 'editsetup':draft=JSON.parse(JSON.stringify({base:state.base,settings:state.settings,name:state.name}));break;
+    case 'editsetup':draft=JSON.parse(JSON.stringify({base:state.base,settings:state.settings,name:state.name,startDate:state.startDate||todayIso()}));break;
     case 'share':{const u=location.href.split('#')[0];try{if(navigator.share){await navigator.share({title:'Hifz Planner',text:'A free daily Quran memorization planner',url:u});return}}catch(e){}try{await navigator.clipboard.writeText(u);alert('Link copied:\n'+u)}catch(e){prompt('Copy this link:',u)}return}
     case 'install':$('#installhelp').classList.toggle('hidden');return;
     case 'export':{const b=new Blob([JSON.stringify(state)],{type:'application/json'});const a2=document.createElement('a');a2.href=URL.createObjectURL(b);a2.download='hifz-backup-'+todayIso()+'.json';a2.click();return}
@@ -413,7 +421,7 @@ document.addEventListener('change',ev=>{
   if(a==='mtxt'){const n=+t.dataset.n;draft.base[n]=t.value.trim();const chk=t.closest('.msurah').querySelector('[data-a=mchk]');chk.checked=false;refreshEst();return}
   if(a==='unit')s.unitWords=Math.max(6,Math.min(40,+t.value||12));
   if(a==='p1u')s.p1Units=+t.value;if(a==='p1w')s.p1Weeks=Math.max(0,+t.value||0);if(a==='p2u')s.p2Units=+t.value;
-  if(a==='rest')s.restDay=+t.value;if(a==='mmin')s.manzilMin=Math.max(5,+t.value||10);if(a==='name')draft.name=t.value;
+  if(a==='sdate')draft.startDate=t.value;if(a==='rest')s.restDay=+t.value;if(a==='mmin')s.manzilMin=Math.max(5,+t.value||10);if(a==='name')draft.name=t.value;
   refreshEst()});
 document.addEventListener('input',ev=>{const t=ev.target;if(t.dataset.a==='mtxt'&&draft){draft.base[+t.dataset.n]=t.value.trim()}});
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
