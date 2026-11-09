@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Hifz Planner</title>
+<meta name="description" content="A free daily Quran memorization (hifz) planner: new lesson, recent revision and old revision in 30 minutes a day.">
+<meta name="theme-color" content="#1b5e3b">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f7f5;--card:#fff;--ink:#16231c;--mut:#5d6b63;--line:#dfe7e2;--pri:#1b5e3b;--pri2:#e6f2ea;--warn:#b26a00;--warnbg:#fff3df;--ok:#1b8a4f;--bad:#b3261e;--hl:#fff1a8}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0f1713;--card:#18231d;--ink:#e8f0eb;--mut:#9fb1a6;--line:#2a3a32;--pri:#4fb783;--pri2:#1f3329;--warnbg:#3a2c12;--hl:#5b4d10}}
+:root[data-theme=dark]{--bg:#0f1713;--card:#18231d;--ink:#e8f0eb;--mut:#9fb1a6;--line:#2a3a32;--pri:#4fb783;--pri2:#1f3329;--warnbg:#3a2c12;--hl:#5b4d10}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;padding-bottom:84px}
+header{background:var(--pri);color:#fff;padding:14px 16px calc(14px);position:sticky;top:0;z-index:5}
+:root[data-theme=dark] header,:root:not([data-theme=light]) header{}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]) header{background:#16402b}}
+header h1{margin:0;font-size:18px;font-weight:700}
+header .sub{font-size:13px;opacity:.9}
+main{max-width:640px;margin:0 auto;padding:12px 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:0 0 12px}
+.card h2{margin:0 0 4px;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);font-weight:700}
+.card h3{margin:0 0 6px;font-size:16px}
+.big{font-size:20px;font-weight:700;line-height:1.3}
+.mut{color:var(--mut);font-size:14px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.grow{flex:1}
+button,.btn{font:inherit;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 14px;border-radius:10px;cursor:pointer}
+button.pri{background:var(--pri);color:#fff;border-color:var(--pri)}
+:root[data-theme=dark] button.pri,@media (prefers-color-scheme:dark){}
+button.sm{padding:5px 10px;font-size:14px}
+button:disabled{opacity:.5}
+.tick{display:flex;align-items:center;gap:12px;padding:10px 12px;border:2px solid var(--line);border-radius:12px;background:var(--card);width:100%;text-align:left;font-size:16px}
+.tick .box{width:28px;height:28px;border:2px solid var(--mut);border-radius:8px;display:grid;place-items:center;font-size:18px;flex:none;color:#fff}
+.tick.on{border-color:var(--ok);background:var(--pri2)}
+.tick.on .box{background:var(--ok);border-color:var(--ok)}
+.tag{display:inline-block;padding:2px 9px;border-radius:99px;background:var(--pri2);color:var(--pri);font-size:12px;font-weight:700}
+.tag.warn{background:var(--warnbg);color:var(--warn)}
+.arabic{font-family:"Amiri","Scheherazade New","Traditional Arabic",serif;font-size:28px;line-height:2.2;direction:rtl;text-align:right}
+.arabic .hl{background:var(--hl);border-radius:6px}
+.arabic .num{font-size:20px;color:var(--pri);margin:0 4px}
+nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);display:flex;z-index:6;padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;border:0;border-radius:0;background:none;padding:10px 2px 8px;font-size:12px;color:var(--mut)}
+nav button .ic{display:block;font-size:20px;line-height:1.1}
+nav button.on{color:var(--pri);font-weight:700}
+label{display:block;font-size:14px;color:var(--mut);margin:10px 0 4px}
+input[type=text],input[type=number],input[type=date],select,textarea{font:inherit;width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
+.bar{height:12px;background:var(--pri2);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--pri)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--pri2);border-radius:12px;padding:10px}
+.stat b{display:block;font-size:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(26px,1fr));gap:3px}
+.grid i{aspect-ratio:1;border-radius:5px;background:var(--line);font-style:normal;font-size:9px;display:grid;place-items:center;color:var(--ink)}
+.list-item{display:flex;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+.list-item:last-child{border:0}
+.msurah{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
+.msurah input[type=text]{padding:5px 8px;font-size:14px}
+.scroll{max-height:340px;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:0 10px}
+.note{background:var(--warnbg);color:var(--warn);padding:10px 12px;border-radius:10px;font-size:14px;margin:0 0 12px}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button.on{background:var(--pri);color:#fff;border-color:var(--pri)}
+.hidden{display:none}
+.est{background:var(--pri2);border-radius:12px;padding:12px;margin:12px 0;font-weight:700}
+</style>
+</head>
+<body>
+<header><h1>Hifz Planner</h1><div class="sub" id="sub"></div></header>
+<main id="app"></main>
+<nav id="nav"></nav>
+<script>
+const W=[null,[4,4,2,3,4,3,9],[1,9,8,12,9,11,14,11,10,13,11,7,20,16,7,11,17,6,20,28,12,24,20,14,39,44,21,14,20,30,15,13,24,13,19,21,12,18,11,14,19,8,7,12,9,8,12,19,19,10,12,8,7,28,15,7,20,21,18,32,65,24,15,14,12,9,22,25,19,17,26,11,12,41,20,24,9,11,25,25,14,11,29,15,53,14,30,11,27,29,31,12,29,17,10,27,18,12,11,11,22,82,13,14,27,21,18,19,35,19,20,17,33,32,14,17,12,27,11,34,16,12,18,23,23,32,15,18,17,20,10,17,27,17,17,31,22,12,14,33,17,24,49,39,36,15,8,22,19,32,17,6,12,14,13,10,10,27,21,12,13,10,10,43,33,12,25,18,11,23,19,15,27,30,12,15,55,42,9,17,14,17,15,37,47,19,73,17,32,14,29,6,16,24,16,81,34,28,13,25,14,9,29,17,15,14,12,17,12,18,21,22,52,32,24,28,64,17,30,32,45,31,19,15,15,14,7,45,51,32,50,36,73,27,51,27,38,8,16,29,7,7,30,9,17,58,47,31,64,15,28,10,58,23,58,27,27,45,74,43,26,25,13,42,28,36,32,15,18,16,23,32,31,17,50,12,19,14,18,16,16,145,37,31,30,55],[1,7,11,20,11,14,50,16,14,17,16,10,32,26,27,11,6,19,28,30,18,11,20,16,15,27,23,30,24,28,15,12,12,8,19,25,39,17,20,18,22,13,8,21,21,7,25,5,49,20,9,22,9,7,32,13,12,7,16,7,25,17,6,33,17,21,14,14,13,9,11,17,34,9,38,9,27,29,28,14,36,7,14,29,13,19,9,9,11,14,25,16,26,11,12,10,28,13,21,15,18,13,36,15,15,18,10,12,12,25,12,37,16,15,10,20,24,33,30,23,12,13,11,13,16,18,9,12,18,14,5,5,12,14,23,16,13,6,9,26,6,13,12,30,26,22,19,11,13,7,21,45,27,83,23,39,14,7,34,20,23,14,9,25,22,9,38,17,14,19,12,16,17,16,11,25,12,19,39,34,23,9,29,12,26,26,22,21,10,11,21,12,21,15,46,7,8,22,32,11],[31,19,30,15,16,42,20,13,15,14,81,99,20,13,23,16,21,25,38,18,11,18,55,48,65,15,13,9,26,14,12,31,21,44,23,35,16,19,16,16,12,14,51,14,10,39,30,21,15,11,20,12,10,19,12,21,22,28,31,30,15,16,16,24,19,28,6,3,19,8,11,17,19,23,31,22,50,40,21,13,27,14,32,25,24,16,19,25,31,38,34,65,16,42,36,9,31,12,11,34,24,66,22,25,16,8,15,22,19,13,12,14,36,28,21,21,11,9,22,8,7,23,21,16,18,13,42,32,24,12,35,11,13,15,42,30,20,6,15,35,38,19,17,19,11,19,12,16,14,22,9,18,40,19,23,6,37,9,15,14,15,28,28,15,16,16,11,12,12,26,62,19,27,12,15,56],[26,59,66,36,46,65,21,31,11,7,26,49,37,26,25,18,46,35,31,23,15,18,22,18,14,17,26,17,14,9,28,41,36,14,14,25,13,14,15,20,77,30,16,44,33,27,17,57,35,11,27,29,17,40,13,11,25,13,21,29,17,14,14,54,12,26,29,33,20,20,20,37,27,9,27,17,24,18,11,20,15,29,22,16,15,7,19,13,50,16,21,14,25,25,55,22,29,9,12,17,27,9,23,25,22,54,26,24,18,69,13,23,15,23,18,49,32,12,27,12],[15,16,13,11,13,31,16,14,9,13,10,29,11,26,9,10,18,8,43,14,15,12,12,11,35,12,17,17,9,22,29,15,15,24,30,12,20,24,18,15,12,11,14,20,10,24,14,16,8,31,18,26,16,29,6,23,26,15,34,23,18,13,17,10,28,10,6,24,12,48,41,9,29,16,9,17,19,19,13,29,24,11,16,25,8,9,10,17,18,19,49,24,51,31,21,13,17,14,46,17,21,19,10,18,8,15,15,26,23,13,23,25,12,25,13,19,12,10,32,13,22,25,16,31,30,10,12,39,8,30,10,10,19,8,21,34,22,27,25,21,35,18,26,44,40,31,13,40,9,29,50,40,19,17,8,14,38,39,20,17,17,9,9,32,22],[1,13,15,10,12,6,7,10,11,12,16,18,13,5,4,7,16,13,17,25,5,30,12,13,7,22,33,24,18,17,18,28,29,13,20,12,40,43,14,24,11,16,39,30,10,21,14,14,16,21,20,10,40,34,9,16,31,19,21,9,11,11,13,15,19,14,11,7,29,18,27,14,40,26,24,8,16,6,15,13,12,14,7,9,42,26,20,24,46,12,6,14,17,13,18,18,9,9,11,20,25,10,17,9,19,11,6,6,9,8,7,4,11,5,11,12,13,6,4,3,4,3,21,8,5,17,22,18,23,10,24,12,13,24,11,11,31,26,10,9,20,25,44,15,21,37,14,24,18,42,12,16,14,16,46,34,45,34,8,49,21,17,29,21,18,11,21,16,43,10,20,29,16,5,13,33,9,11,33,16,7,8,6,13,23,11,43,30,32,13,7,7,13,15,30,10,10,13,7,11,12,7,25,8,16,12],[21,17,6,12,11,11,23,7,11,20,22,24,14,6,12,21,24,6,26,12,8,11,12,22,14,19,12,10,20,18,18,19,13,22,14,23,19,16,17,11,35,38,22,20,13,15,18,38,19,14,9,20,19,20,10,12,10,15,9,34,14,13,22,9,29,29,22,10,13,26,14,48,14,19,24],[9,15,36,23,28,19,25,17,14,11,14,19,22,11,13,25,19,24,27,17,10,9,21,34,25,19,13,30,29,27,25,15,14,31,20,40,34,31,17,46,16,24,13,15,14,16,18,16,17,17,15,24,13,22,18,10,11,16,19,25,28,12,17,18,14,17,22,19,34,28,27,26,14,50,13,9,15,11,21,27,29,8,26,19,17,18,11,16,14,18,28,23,21,32,21,15,17,18,30,26,26,18,18,16,17,13,26,26,28,16,43,17,20,23,19,19,28,32,9,54,18,24,18,19,12,16,22,14,17],[6,27,33,31,25,14,15,6,16,15,20,28,19,10,43,20,15,31,18,17,24,43,29,44,11,20,31,20,10,18,29,13,10,19,32,19,22,17,21,13,16,12,12,10,21,15,13,7,25,12,12,13,14,24,17,5,15,10,21,20,43,10,4,17,12,27,16,30,9,13,35,18,18,23,14,10,12,16,6,10,19,7,23,13,10,5,17,30,11,29,7,15,25,23,10,8,8,21,16,15,15,16,11,28,9,17,27,26,12],[11,10,26,9,21,18,32,23,11,14,10,29,19,17,14,17,43,25,11,26,9,7,15,14,9,12,29,20,26,11,33,14,10,19,13,17,12,20,10,27,13,20,25,20,15,27,20,20,22,20,16,18,16,17,8,20,23,14,13,19,32,23,24,18,12,19,8,14,17,19,9,14,16,11,5,17,13,30,13,11,34,12,9,31,16,12,22,40,24,10,21,17,22,18,11,6,11,10,10,10,26,13,17,5,11,9,16,20,22,20,11,13,17,16,7,27,8,11,17,18,9,3,17],[6,6,16,16,17,26,8,15,14,16,12,8,13,9,18,4,20,21,20,9,34,10,26,22,24,20,10,14,12,21,33,21,18,11,11,31,28,28,10,35,22,18,26,9,11,22,14,15,11,24,31,12,18,15,9,19,7,9,18,10,6,14,17,19,30,25,32,31,17,15,5,12,12,6,12,37,28,17,13,40,18,12,21,13,12,13,22,23,10,26,9,13,12,13,6,21,9,10,14,51,24,15,6,11,11,7,14,19,32,20,24],[17,30,27,28,30,22,17,16,5,14,38,9,19,29,12,49,47,30,17,7,13,19,16,8,24,17,20,12,8,29,55,14,43,16,24,28,20,23,9,13,18,20,16],[17,15,17,21,22,27,12,13,40,36,31,19,17,11,5,7,17,25,15,5,36,49,18,15,13,13,20,13,5,13,21,27,10,17,13,17,26,19,14,10,8,14,10,27,14,12,12,11,6,6,11,13],[7,7,8,8,7,9,8,9,7,7,8,5,8,9,8,7,5,7,11,8,11,12,6,7,8,8,7,12,9,4,7,9,11,5,6,6,4,4,10,4,5,11,4,8,5,3,10,8,7,5,4,9,7,8,7,8,5,6,6,7,5,4,7,4,14,9,4,6,4,5,6,5,3,8,5,3,5,5,5,5,5,6,3,6,16,5,7,15,5,4,4,3,3,6,3,9,7,6,5],[10,18,8,8,9,7,15,10,11,14,17,17,14,21,11,5,8,11,6,10,8,12,14,10,17,21,22,21,9,25,17,13,24,10,34,30,15,20,11,10,20,5,16,13,16,7,8,17,14,8,15,12,13,10,8,13,8,9,21,14,25,18,17,15,17,18,16,13,26,22,24,22,15,11,31,31,21,16,19,26,26,6,7,14,11,20,11,13,26,18,21,34,18,20,16,17,19,8,10,9,19,13,17,12,12,24,13,12,7,18,16,24,9,13,23,23,5,16,19,11,8,10,13,18,25,13,15,8],[22,12,10,13,18,11,25,13,16,9,9,25,14,7,24,14,14,18,12,13,12,9,27,12,13,10,10,12,13,13,15,9,24,19,12,17,14,7,19,12,10,13,6,23,12,20,19,9,9,6,29,9,18,16,17,13,19,19,23,27,13,15,10,20,10,15,20,15,23,18,16,11,14,9,12,14,12,15,12,14,10,14,13,11,15,13,10,19,14,10,11,12,27,15,14,12,31,14,24,15,20,16,9,14,10,9,19,8,6,24,22],[12,15,3,6,18,11,11,6,10,16,7,9,12,20,20,19,38,25,41,13,35,36,7,18,8,26,16,32,32,12,29,15,12,13,12,12,16,8,20,15,8,20,11,10,24,14,11,17,30,28,14,13,10,15,19,20,32,21,8,13,11,12,21,10,12,11,6,8,10,12,16,8,10,16,10,14,25,13,17,10,9,37,10,10,2,26,13,14,3,15,6,3,13,20,12,21,8,17,13,5,11,15,5,11,14,9,10,6,18,25],[1,5,5,14,13,9,13,14,14,14,11,9,7,6,9,10,11,8,9,11,17,6,14,10,8,19,12,12,11,8,11,6,9,10,18,9,12,12,12,8,9,16,14,11,12,15,12,14,15,9,11,7,7,12,9,9,3,31,13,12,12,12,9,20,13,8,10,8,10,8,10,8,16,9,26,14,8,7,10,5,8,7,9,8,6,5,9,4,4,9,4,6,10,4,5,9,10,14],[1,5,4,6,4,12,7,9,4,18,5,10,5,11,10,10,5,13,4,5,8,11,4,5,5,3,4,2,5,2,3,3,3,2,4,6,5,6,23,38,2,8,5,8,10,8,23,10,5,9,5,12,19,10,9,6,8,14,8,6,16,5,13,11,12,13,5,6,18,8,28,21,15,13,10,13,18,8,5,15,18,9,7,9,9,29,15,12,12,18,9,8,5,21,5,16,31,13,14,8,8,9,6,12,7,3,6,14,12,10,11,11,14,19,11,9,13,7,6,14,16,6,20,12,8,9,13,18,9,21,19,15,14,19,12],[7,11,17,11,14,9,15,9,8,9,10,7,10,6,8,7,11,14,14,5,7,14,6,26,15,10,6,15,15,20,13,9,12,11,12,17,9,7,16,10,13,14,15,20,12,12,22,8,8,8,10,11,5,8,7,13,7,8,8,7,8,7,9,7,9,11,10,7,8,5,8,9,16,17,7,12,13,14,17,11,15,13,11,17,8,7,23,9,11,21,11,8,7,12,7,10,20,11,10,7,9,10,11,19,12,6,5,12,14,8,8,11],[11,22,12,11,73,13,12,13,17,9,28,15,11,18,22,9,23,41,19,6,4,12,23,9,26,16,14,21,8,26,22,9,11,22,15,30,22,15,11,38,18,9,4,13,14,24,15,11,9,8,8,28,17,22,16,13,8,19,8,18,15,17,16,13,28,11,20,7,9,20,19,33,32,10,12,11,13,49],[3,5,5,4,4,10,7,5,5,3,6,7,6,22,5,5,10,14,13,9,16,4,18,26,10,5,35,15,8,7,6,15,25,7,9,5,10,12,5,5,9,6,7,22,8,7,7,4,6,11,13,8,10,5,7,8,7,5,5,10,7,14,14,8,8,9,4,10,7,11,17,10,5,8,12,8,12,11,7,11,6,8,12,8,6,8,6,14,6,5,26,6,6,6,7,10,7,5,8,19,10,6,10,6,8,8,7,5,14,8,8,7,8,10,8,12,19,7],[9,28,19,20,11,18,9,12,9,9,32,12,15,15,16,14,9,8,21,9,39,29,13,9,11,19,20,25,18,17,82,19,52,13,56,14,20,15,23,35,23,8,39,11,34,12,16,11,7,17,19,10,21,26,40,8,13,56,21,25,79,42,29,24],[9,19,22,17,9,13,17,18,9,17,9,9,9,8,14,11,16,21,16,22,21,10,9,7,7,10,12,7,12,10,12,17,8,11,9,9,14,8,8,18,11,18,9,17,16,5,11,14,10,9,7,7,16,13,15,5,14,14,18,14,11,13,12,5,12,4,11,23,8,17,9,9,10,13,9,6,13],[1,4,6,11,11,8,11,9,5,8,5,6,8,6,9,7,5,10,7,6,11,8,5,10,5,5,7,10,8,5,7,6,6,7,8,7,4,5,5,7,12,6,7,9,8,3,4,3,23,8,11,9,5,4,3,3,4,3,4,2,8,7,14,3,5,3,9,5,4,6,6,5,4,6,5,3,6,4,4,4,4,8,6,6,5,6,4,6,6,3,3,6,7,4,3,4,6,4,4,4,3,7,9,5,4,7,4,3,12,3,6,6,8,4,5,9,5,9,6,4,9,5,3,7,4,3,12,5,4,4,3,5,3,2,6,9,5,3,12,5,3,7,4,3,12,5,3,4,5,3,4,6,5,11,9,7,3,12,5,4,7,4,3,12,4,12,9,5,5,3,4,3,7,9,5,4,6,4,3,12,7,3,9,5,5,9,9,5,11,9,5,4,4,5,3,4,9,5,6,5,7,5,4,2,4,5,6,7,4,4,5,4,9,3,6,7,4,4,3,4,6,5,4,3,7,5,20],[7,3,9,10,10,7,16,14,7,22,11,21,8,12,16,21,9,20,24,12,9,14,11,17,14,9,8,11,9,8,5,13,12,14,8,16,13,11,17,41,12,16,13,31,13,14,15,10,14,7,9,12,5,8,12,17,7,7,13,29,23,18,22,21,15,16,9,12,9,9,7,9,10,8,10,12,4,9,8,11,15,17,11,13,8,16,19,20,11,13,18,17,12],[1,4,9,20,12,12,24,14,19,18,11,17,17,11,41,14,9,17,34,19,11,11,30,15,28,12,32,17,28,20,23,27,9,15,16,17,19,29,12,11,10,11,16,13,19,20,18,28,13,25,7,8,15,12,15,14,26,19,21,17,17,8,20,14,6,7,11,16,7,17,20,22,13,8,17,32,30,30,22,16,17,28,15,19,20,16,18,22],[1,10,12,11,13,11,12,23,7,32,6,19,12,16,6,14,29,14,14,21,9,18,13,21,28,15,19,14,24,6,16,18,24,12,7,17,7,17,14,30,21,13,9,11,24,27,22,14,15,17,16,21,13,6,13,9,8,18,5,13,14,15,24,17,16,7,16,18,10],[1,2,8,14,10,12,10,24,34,13,8,5,9,5,9,11,6,8,15,11,21,14,15,22,17,9,20,29,18,25,10,12,18,7,10,16,16,18,23,24,15,15,17,10,12,17,19,29,10,21,9,11,15,27,13,21,9,20,8,11],[1,4,3,9,9,19,17,8,10,29,15,20,16,17,32,26,19,17,12,31,22,17,17,7,17,11,22,12,25,16,20,23,33,30],[1,8,19,26,17,6,11,8,16,15,12,16,16,15,16,11,13,9,12,22,9,14,15,11,11,20,18,7,11,5],[15,13,7,32,31,32,18,9,23,16,6,13,28,14,14,15,25,16,39,25,17,19,20,17,18,16,14,16,14,18,15,21,27,15,30,25,50,24,14,18,8,3,14,9,8,6,8,13,24,64,40,26,76,11,32,15,14,12,24,20,7,13,17,7,9,12,8,8,18,9,15,19,16],[18,19,34,11,11,16,16,17,31,16,14,30,21,28,23,16,9,18,20,10,22,27,25,20,9,11,14,12,7,10,33,16,36,14,8,13,23,9,22,10,15,18,35,12,15,28,19,7,8,18,10,9,11,16],[26,21,25,12,17,14,14,28,18,27,37,30,30,20,13,6,5,38,4,4,4,18,4,13,13,8,23,19,16,9,17,23,14,12,14,19,27,11,27,34,22,20,30,32,26],[1,2,3,3,3,7,8,10,12,8,13,15,8,11,15,6,5,13,11,11,7,8,15,5,4,9,7,14,8,13,11,6,10,10,9,13,9,9,7,16,8,6,9,6,11,11,24,7,8,7,10,15,10,11,7,7,6,5,4,16,6,9,5,5,11,9,10,8,13,8,12,6,7,7,7,10,11,12,11,11,15,10,8],[2,2,2,3,7,6,5,9,5,7,13,3,4,4,6,7,2,4,7,6,7,8,7,4,4,4,5,6,5,11,7,4,5,4,10,6,5,4,6,4,4,4,3,3,5,3,7,4,3,5,7,4,7,4,5,5,6,3,6,5,4,6,4,6,4,6,7,5,4,4,5,4,5,4,5,5,4,4,5,4,4,3,5,5,6,5,4,4,3,3,6,4,4,3,4,4,7,5,6,5,3,30,4,4,8,5,3,4,3,3,4,5,11,5,5,4,3,3,4,4,4,4,4,5,5,5,3,4,4,4,4,4,4,4,4,3,4,4,4,5,4,4,5,6,5,5,6,4,5,6,5,4,4,4,2,4,5,11,4,4,3,4,5,6,3,3,3,6,4,5,5,3,4,4,3,2,6,4,3,6,3,4],[5,6,10,11,9,13,10,17,7,11,6,8,8,7,10,8,12,7,6,6,8,25,15,35,10,32,18,13,9,9,6,11,7,9,16,8,4,4,7,6,11,7,10,17,8,5,5,9,7,5,7,5,5,7,6,4,4,4,12,13,11,10,6,6,12,7,4,3,9,8,9,9,4,6,16,11,5,6,6,4,4,4,4,4,7,10,5,4],[6,10,35,18,27,40,36,37,26,25,9,5,9,6,21,19,13,15,10,22,32,22,36,14,10,14,11,7,21,4,7,17,9,9,12,17,13,39,11,8,21,28,15,13,19,17,26,11,23,11,16,16,24,13,16,15,9,12,10,15,11,10,12,7,14,6,18,23,15,9,36,10,21,17,18],[1,6,16,13,24,10,27,17,14,15,13,17,15,8,16,18,15,16,6,17,32,14,6,7,20,19,13,42,28,11,15,7,17,32,25,10,25,9,12,24,11,15,22,14,11,14,19,12,13,19,11,11,8,4,12,26,12,14,11,14,21,13,7,23,15,21,32,13,10,10,6,6,7,19,11,9,15,34,9,12,6,26,15,12,19],[1,4,7,7,17,17,8,9,16,15,16,21,9,24,27,21,14,5,8,12,19,20,9,12,27,11,10,16,16,19,17,4,13,18,11,12,20,13,24,29,10,14,18,34,20,13,31,13,11,33,13,17,20,13],[1,1,10,11,21,12,23,20,17,16,23,15,42,32,43,18,12,24,10,23,24,27,32,25,12,13,19,14,17,10,15,6,16,7,9,18,10,11,6,16,9,16,8,21,29,17,22,30,17,13,24,29,16],[1,2,6,7,8,6,8,7,10,11,13,11,20,4,10,7,12,9,14,17,8,11,21,16,8,9,5,7,9,9,10,28,17,5,14,11,7,12,9,11,6,7,9,7,13,12,7,14,12,7,19,11,11,8,6,4,10,16,10,8,11,8,18,10,12,10,7,9,5,5,17,7,6,6,6,6,10,7,5,12,8,8,8,12,13,13,9,8,7],[1,2,9,5,7,8,9,11,5,6,6,6,7,6,7,6,9,10,10,6,5,6,5,7,5,3,4,5,8,7,8,6,7,3,8,5,14,7,8,5,10,9,3,2,4,2,5,7,5,6,5,3,5,4,5,11,8,5,3],[1,6,6,9,20,13,4,15,12,21,12,15,17,14,13,13,26,13,17,7,18,13,25,23,16,18,11,15,12,14,12,22,11,14,17,8,9],[1,6,16,30,18,9,14,29,25,25,20,17,13,9,49,19,28,18,10,27,26,12,13,20,15,32,10,19,19,20,15,19,23,20,30],[8,19,19,40,3,4,10,6,8,19,11,23,14,13,47,25,6,17,15,30,13,10,7,7,17,16,7,10,11,14,8,21,12,15,12,14,6,33],[5,15,4,21,20,24,9,5,8,27,40,20,9,16,35,30,29,20,8,18,15,12,13,20,43,29,30,15,60],[18,23,18,9,13,18,30,8,33,11,43,36,23,31,19,17,21,11],[4,11,8,10,9,12,11,5,10,5,10,7,4,10,11,15,8,8,10,7,6,12,6,6,4,10,11,8,8,9,5,6,7,6,6,15,13,13,12,5,7,8,6,10,15],[2,2,2,2,3,3,3,4,4,2,5,4,5,7,5,10,6,3,5,4,5,5,9,6,10,6,5,11,9,9,6,6,5,4,6,7,7,8,6,7,7,9,8,8,7,9,5,4,7,9,12,13,7,5,5,6,9,7,9,7],[1,2,3,2,2,2,4,4,4,3,3,5,6,6,6,13,5,8,6,8,20,5,8,8,5,7,6,10,8,7,6,9,7,6,8,8,7,10,5,7,5,8,10,9,7,9,10,11,5],[3,5,4,5,3,3,3,3,5,5,5,4,4,3,3,5,5,6,3,3,4,4,27,4,3,19,9,18,11,17,16,35,3,3,5,7,3,5,6,4,4,4,4,4,5,4,4,4,4,4,3,10,2,3,4,5,2,6,4,3,2,4],[4,7,7,7,6,9,8,9,10,5,5,9,5,6,6,4,7,6,9,6,4,7,3,10,9,5,7,9,4,4,8,7,4,10,8,5,9,5,3,7,5,7,9,5,4,6,5,9,5,6,6,5,4,5,6],[1,2,2,2,3,3,4,4,6,3,5,4,4,5,6,4,4,4,3,4,4,4,4,6,4,4,6,4,11,4,4,4,18,4,8,4,6,4,8,4,6,4,6,5,4,5,4,2,4,3,4,5,4,10,4,9,4,3,4,5,4,3,4,1,4,3,4,4,4,3,4,4,4,6,4,6,4,6],[3,3,2,4,3,3,3,5,5,2,2,3,3,3,3,3,4,5,5,3,4,2,3,4,6,4,5,3,2,2,2,2,4,2,3,2,2,2,3,3,5,3,3,4,5,5,9,2,4,5,5,5,3,4,3,4,4,3,5,7,9,6,3,5,6,2,3,4,7,6,4,6,5,4,5,5,3,3,4,4,4,4,4,3,7,5,4,5,4,6,5,6,3,2,5,4],[10,13,10,39,9,13,16,16,18,41,12,23,27,21,18,30,14,12,22,42,27,22,16,13,30,16,41,23,24],[19,26,23,30,20,17,50,40,21,18,33,25,26,20,11,10,17,19,17,8,10,56],[12,45,15,13,13,26,40,19,32,23,29,16,13,26,12,17,11,20,11,11,19,15,20,20],[52,13,15,53,14,20,18,22,22,65,22,41,20],[12,9,9,11,26,33,17,11,14,12,16,18,11,39],[12,21,9,11,25,18,10,19,23,15,23],[18,13,11,29,14,19,21,18,19,21,12],[19,12,10,15,13,18,20,11,30,12,18,12,10,20,9,17,13,5],[47,32,24,30,15,36,28,14,7,19,36,25],[17,13,31,23,17,23,13,48,14,28,24,17],[9,12,20,10,13,8,8,14,18,11,5,9,10,7,15,11,13,8,17,16,13,12,13,8,7,9,13,15,14,10],[5,5,5,4,2,2,11,3,4,5,3,4,4,5,7,3,10,2,7,2,2,7,3,6,4,5,3,7,6,5,6,10,10,6,3,4,5,5,13,4,8,9,12,11,6,7,5,11,10,5,12,5],[1,2,4,4,4,6,15,5,6,6,7,6,6,6,3,5,10,6,9,5,4,3,2,8,11,4,4,5,3,2,3,7,6,5,5,5,4,4,3,4,8,7,4,5,3,4,6,3,5,4,3,4],[4,4,4,11,3,3,2,4,3,4,10,2,3,6,4,2,4,2,5,4,4,2,5,5,2,4,6,5,4,10,7,5,4,5,4,5,5,8,6,7,8,8,9,10],[14,7,5,20,7,5,14,4,7,6,4,9,6,3,8,7,5,5,5,4,13,3,13,9,12,10,10,15],[13,10,9,7,10,11,9,8,14,13,10,11,15,11,5,8,11,8,10,8,8,12,17,11,11,7,13,13],[3,4,5,6,5,8,6,6,9,7,6,4,5,8,11,6,8,7,10,90],[3,2,2,2,2,3,2,4,4,4,4,4,2,3,4,6,2,3,3,4,2,3,3,6,5,2,4,4,2,3,63,2,3,3,3,2,7,5,3,3,2,4,5,4,4,4,3,4,5,3,3,9,6,3,3,12],[4,4,5,6,5,4,3,2,3,5,3,4,6,5,3,6,4,4,4,4,2,3,3,3,5,4,4,3,3,4,4,3,5,3,4,5,6,5,5,7],[11,10,7,6,8,7,7,7,10,7,8,5,11,6,8,5,6,4,10,7,14,8,6,9,5,7,8,10,10,12,11],[2,2,2,2,2,3,3,3,3,3,3,3,2,5,3,3,3,3,3,5,4,3,3,3,4,2,7,3,6,6,6,4,3,3,4,4,3,6,5,3,5,3,6,4,3,5,3,6,3,4],[2,3,4,2,3,4,2,2,3,3,3,4,3,5,4,2,5,6,4,4,4,2,3,6,3,2,5,3,4,5,3,2,2,2,6,5,11,15,10,16],[2,2,2,2,2,3,2,3,2,5,4,5,4,3,4,6,5,6,4,3,2,3,2,4,5,6,7,3,4,4,4,2,3,4,5,4,3,3,4,9,4,5,4,3,5,9],[2,3,4,4,3,3,4,4,2,3,3,3,3,2,2,2,4,4,4,3,3,4,5,4,4,4,3,2,2,2,2,3,3,5,2,2,6,3,2,4,2,4],[3,3,3,3,3,3,3,3,3,3,3,3,3,4,3,2,3,3,4,6,3,3,4,5,5,2,5,5,8],[3,3,3,3,5,7,4,6,4,3,2,3,4,4,3,4,5,6,10],[2,6,5,5,2,5,6,4,2,3,4,7,7,10,6,4,7,6,4,2,2,4,3,5,4,7,3,4,8,4,6,6,4,6,3,6],[3,3,3,4,3,9,5,4,4,6,3,2,5,5,6,3,3,3,4,4,7,4,4,3,9],[3,2,2,3,3,4,6,9,11,14,15,4,4,3,3,3,4,2,5,4,4,3],[2,4,2,6,4,4,5,4,3,6,3,3,3,3,3,2,4],[4,3,3,3,3,3,10,2,4,3,2,4,6,4,4,4,3,5,3],[4,3,2,3,4,6,6,3,2,3,4,3,3,2,2,2,6,4,4,4,4,3,4,4,3,4],[1,2,2,3,6,6,3,6,5,3,4,3,5,3,11,10,6,5,4,4,6,5,10,5,5,4,4,5,3,2],[4,4,3,5,6,4,5,4,2,2,3,4,2,6,3,4,9,3,6,3],[2,3,3,3,3,3,3,3,4,4,3,3,7,7,3],[3,3,4,3,4,2,2,4,2,2,6,3,4,3,4,3,2,4,6,5,2],[1,3,5,5,4,4,3,3,4,4,4],[4,3,3,3,4,4,3,3],[2,2,3,6,4,9,4,4],[5,4,3,3,5,4,3,4,3,3,5,3,4,5,6,3,2,2,6],[5,5,6,9,5],[12,6,3,11,17,17,9,23],[4,3,4,3,4,6,6,6],[2,2,2,3,3,4,4,4,8,4,5],[1,2,4,5,4,4,4,4,2,4,2],[2,3,3,4,5,2,4,5],[1,4,9],[4,4,4,5,4,3,4,3,3],[7,5,4,4,3],[2,4,4,7],[4,4,5,2,5,3,2],[3,3,4],[4,4,5,5,5,4],[5,7,8],[5,6,4,3,5],[4,2,4,5],[4,4,5,5,5],[4,2,2,4,5,3]];
+const NAMES=[null, "Al-Faatiha", "Al-Baqara", "Aal-i-Imraan", "An-Nisaa", "Al-Maaida", "Al-An'aam", "Al-A'raaf", "Al-Anfaal", "At-Tawba", "Yunus", "Hud", "Yusuf", "Ar-Ra'd", "Ibrahim", "Al-Hijr", "An-Nahl", "Al-Israa", "Al-Kahf", "Maryam", "Taa-Haa", "Al-Anbiyaa", "Al-Hajj", "Al-Muminoon", "An-Noor", "Al-Furqaan", "Ash-Shu'araa", "An-Naml", "Al-Qasas", "Al-Ankaboot", "Ar-Room", "Luqman", "As-Sajda", "Al-Ahzaab", "Saba", "Faatir", "Yaseen", "As-Saaffaat", "Saad", "Az-Zumar", "Ghafir", "Fussilat", "Ash-Shura", "Az-Zukhruf", "Ad-Dukhaan", "Al-Jaathiya", "Al-Ahqaf", "Muhammad", "Al-Fath", "Al-Hujuraat", "Qaaf", "Adh-Dhaariyat", "At-Tur", "An-Najm", "Al-Qamar", "Ar-Rahmaan", "Al-Waaqia", "Al-Hadid", "Al-Mujaadila", "Al-Hashr", "Al-Mumtahana", "As-Saff", "Al-Jumu'a", "Al-Munaafiqoon", "At-Taghaabun", "At-Talaaq", "At-Tahrim", "Al-Mulk", "Al-Qalam", "Al-Haaqqa", "Al-Ma'aarij", "Nooh", "Al-Jinn", "Al-Muzzammil", "Al-Muddaththir", "Al-Qiyaama", "Al-Insaan", "Al-Mursalaat", "An-Naba", "An-Naazi'aat", "Abasa", "At-Takwir", "Al-Infitaar", "Al-Mutaffifin", "Al-Inshiqaaq", "Al-Burooj", "At-Taariq", "Al-A'laa", "Al-Ghaashiya", "Al-Fajr", "Al-Balad", "Ash-Shams", "Al-Lail", "Ad-Dhuhaa", "Ash-Sharh", "At-Tin", "Al-Alaq", "Al-Qadr", "Al-Bayyina", "Az-Zalzala", "Al-Aadiyaat", "Al-Qaari'a", "At-Takaathur", "Al-Asr", "Al-Humaza", "Al-Fil", "Quraish", "Al-Maa'un", "Al-Kawthar", "Al-Kaafiroon", "An-Nasr", "Al-Masad", "Al-Ikhlaas", "Al-Falaq", "An-Naas"];
+const AR=[null, "سُورَةُ ٱلْفَاتِحَةِ", "سُورَةُ البَقَرَةِ", "سُورَةُ آلِ عِمۡرَانَ", "سُورَةُ النِّسَاءِ", "سُورَةُ المَائـِدَةِ", "سُورَةُ الأَنۡعَامِ", "سُورَةُ الأَعۡرَافِ", "سُورَةُ الأَنفَالِ", "سُورَةُ التَّوۡبَةِ", "سُورَةُ يُونُسَ", "سُورَةُ هُودٍ", "سُورَةُ يُوسُفَ", "سُورَةُ الرَّعۡدِ", "سُورَةُ إِبۡرَاهِيمَ", "سُورَةُ الحِجۡرِ", "سُورَةُ النَّحۡلِ", "سُورَةُ الإِسۡرَاءِ", "سُورَةُ الكَهۡفِ", "سُورَةُ مَرۡيَمَ", "سُورَةُ طه", "سُورَةُ الأَنبِيَاءِ", "سُورَةُ الحَجِّ", "سُورَةُ المُؤۡمِنُونَ", "سُورَةُ النُّورِ", "سُورَةُ الفُرۡقَانِ", "سُورَةُ الشُّعَرَاءِ", "سُورَةُ النَّمۡلِ", "سُورَةُ القَصَصِ", "سُورَةُ العَنكَبُوتِ", "سُورَةُ الرُّومِ", "سُورَةُ لُقۡمَانَ", "سُورَةُ السَّجۡدَةِ", "سُورَةُ الأَحۡزَابِ", "سُورَةُ سَبَإٍ", "سُورَةُ فَاطِرٍ", "سُورَةُ يسٓ", "سُورَةُ الصَّافَّاتِ", "سُورَةُ صٓ", "سُورَةُ الزُّمَرِ", "سُورَةُ غَافِرٍ", "سُورَةُ فُصِّلَتۡ", "سُورَةُ الشُّورَىٰ", "سُورَةُ الزُّخۡرُفِ", "سُورَةُ الدُّخَانِ", "سُورَةُ الجَاثِيَةِ", "سُورَةُ الأَحۡقَافِ", "سُورَةُ مُحَمَّدٍ", "سُورَةُ الفَتۡحِ", "سُورَةُ الحُجُرَاتِ", "سُورَةُ قٓ", "سُورَةُ الذَّارِيَاتِ", "سُورَةُ الطُّورِ", "سُورَةُ النَّجۡمِ", "سُورَةُ القَمَرِ", "سُورَةُ الرَّحۡمَٰن", "سُورَةُ الوَاقِعَةِ", "سُورَةُ الحَدِيدِ", "سُورَةُ المُجَادلَةِ", "سُورَةُ الحَشۡرِ", "سُورَةُ المُمۡتَحنَةِ", "سُورَةُ الصَّفِّ", "سُورَةُ الجُمُعَةِ", "سُورَةُ المُنَافِقُونَ", "سُورَةُ التَّغَابُنِ", "سُورَةُ الطَّلَاقِ", "سُورَةُ التَّحۡرِيمِ", "سُورَةُ المُلۡكِ", "سُورَةُ القَلَمِ", "سُورَةُ الحَاقَّةِ", "سُورَةُ المَعَارِجِ", "سُورَةُ نُوحٍ", "سُورَةُ الجِنِّ", "سُورَةُ المُزَّمِّلِ", "سُورَةُ المُدَّثِّرِ", "سُورَةُ القِيَامَةِ", "سُورَةُ الإِنسَانِ", "سُورَةُ المُرۡسَلَاتِ", "سُورَةُ النَّبَإِ", "سُورَةُ النَّازِعَاتِ", "سُورَةُ عَبَسَ", "سُورَةُ التَّكۡوِيرِ", "سُورَةُ الانفِطَارِ", "سُورَةُ المُطَفِّفِينَ", "سُورَةُ الانشِقَاقِ", "سُورَةُ البُرُوجِ", "سُورَةُ الطَّارِقِ", "سُورَةُ الأَعۡلَىٰ", "سُورَةُ الغَاشِيَةِ", "سُورَةُ الفَجۡرِ", "سُورَةُ البَلَدِ", "سُورَةُ الشَّمۡسِ", "سُورَةُ اللَّيۡلِ", "سُورَةُ الضُّحَىٰ", "سُورَةُ الشَّرۡحِ", "سُورَةُ التِّينِ", "سُورَةُ العَلَقِ", "سُورَةُ القَدۡرِ", "سُورَةُ البَيِّنَةِ", "سُورَةُ الزَّلۡزَلَةِ", "سُورَةُ العَادِيَاتِ", "سُورَةُ القَارِعَةِ", "سُورَةُ التَّكَاثُرِ", "سُورَةُ العَصۡرِ", "سُورَةُ الهُمَزَةِ", "سُورَةُ الفِيلِ", "سُورَةُ قُرَيۡشٍ", "سُورَةُ المَاعُونِ", "سُورَةُ الكَوۡثَرِ", "سُورَةُ الكَافِرُونَ", "سُورَةُ النَّصۡرِ", "سُورَةُ المَسَدِ", "سُورَةُ الإِخۡلَاصِ", "سُورَةُ الفَلَقِ", "سُورَةُ النَّاسِ"];
+
+(function(){
+'use strict';
+const TOTAL=W.reduce((s,a)=>s+(a?a.reduce((x,y)=>x+y,0):0),0);
+const PG=TOTAL/604;
+const LS='hifz-planner-v1';
+const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const $=(s,r)=> (r||document).querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pad=n=>String(n).padStart(2,'0');
+const iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const fromIso=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const fmtDate=d=>d.toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+const todayIso=()=>iso(new Date());
+const sumW=(n,a,b)=>{let t=0;for(let i=a;i<=b;i++)t+=W[n][i-1];return t};
+const len=n=>W[n].length;
+const rnd=x=>{const f=Math.floor(x),d=x-f;if(Math.abs(d-0.5)<1e-9)return f%2===0?f:f+1;return Math.round(x)};
+
+/* ---------- state ---------- */
+function defState(){return{v:1,setup:false,name:'',settings:{restDay:5,unitWords:12,p1Weeks:26,p1Units:1,p2Units:2,order:'easy',manzilMin:10,theme:'auto'},base:{},log:[],conf:{},revised:{},pool:null,ptr:0,card:null,history:{},restOverride:{},startDate:null}}
+function load(){try{const s=JSON.parse(localStorage.getItem(LS));if(s&&s.v===1){const d=defState();return Object.assign(d,s,{settings:Object.assign(d.settings,s.settings)})}}catch(e){}return defState()}
+let state=load();
+function save(){try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){}}
+let tab='today',cacheKey='',cache=null;
+let draft=null; // setup draft while editing
+
+/* ---------- known ayat ---------- */
+function parseRanges(str,max){const a=new Array(max).fill(false);str=(str||'').trim().toLowerCase();if(!str)return a;if(str==='all'){a.fill(true);return a}
+  str.split(/[,;\s]+/).forEach(p=>{if(!p)return;const m=p.match(/^(\d+)(?:[-–](\d+))?$/);if(!m)return;let x=+m[1],y=m[2]?+m[2]:x;if(x>y)[x,y]=[y,x];for(let i=Math.max(1,x);i<=Math.min(max,y);i++)a[i-1]=true});return a}
+function computeKnown(base,log){const known={},partial={};
+  for(let n=1;n<=114;n++)known[n]=parseRanges(base[n],len(n));
+  (log||[]).forEach(e=>{if(e.fin){for(let i=e.a;i<=e.b;i++)known[e.n][i-1]=true;delete partial[e.n+':'+e.a]}else partial[e.n+':'+e.a]=(partial[e.n+':'+e.a]||0)+e.words});
+  return{known,partial}}
+const S=(n)=>[n,1,len(n)];
+function orderSegs(kind){
+  if(kind==='mushaf'){const r=[];for(let n=1;n<=114;n++)r.push(S(n));return r}
+  if(kind==='reverse'){const r=[];for(let n=114;n>=1;n--)r.push(S(n));return r}
+  const r=[S(1)];
+  for(let n=114;n>=78;n--)r.push(S(n));
+  r.push(S(67));for(let n=77;n>=70;n--)r.push(S(n));
+  r.push(S(68),S(69),[2,255,257],[2,284,286],S(36),S(55));
+  [66,65,64,63,62,61,60,59,58,56,57,32,49,50,51,52,53,54,47,48].forEach(n=>r.push(S(n)));
+  for(let n=46;n>=37;n--)r.push(S(n));
+  r.push(S(35),S(34),S(33));
+  for(let n=31;n>=19;n--)r.push(S(n));
+  r.push(S(18));
+  for(let n=17;n>=3;n--)r.push(S(n));
+  r.push(S(2));
+  return r}
+
+/* ---------- lessons ---------- */
+function labelOf(l){let s=NAMES[l.n]+' '+l.n+':'+l.a+(l.a===l.b?'':'–'+l.b);if(l.pos)s+='  (words '+l.pos[0]+'–'+l.pos[1]+' of '+l.tot+')';return s}
+function genLessons(st,limit){
+  const {known,partial}=computeKnown(st.base,st.log);
+  const U=st.settings.unitWords,P1=Math.round(st.settings.p1Weeks*6);
+  let cnt=st.log.length;const out=[];
+  const segs=orderSegs(st.settings.order);
+  const Bnow=()=>U*(cnt<P1?st.settings.p1Units:st.settings.p2Units);
+  for(const [n,a,b] of segs){
+    let i=a;
+    while(i<=b){
+      if(known[n][i-1]){i++;continue}
+      let end=i;while(end+1<=b&&!known[n][end])end++;
+      // lessons in run i..end
+      let x=i;
+      while(x<=end){
+        const B=Bnow(),tot=W[n][x-1],wd=partial[n+':'+x]||0,rem=tot-wd;
+        if(rem>1.4*B){
+          const k=Math.max(2,rnd(rem/B)),base=Math.floor(rem/k),r=rem%k;let pos=wd+1;
+          for(let p=0;p<k;p++){const c=base+(p<r?1:0);
+            out.push({n,a:x,b:x,words:c,pos:[pos,pos+c-1],tot,fin:p===k-1,phase:cnt<P1?1:2,runEnd:false});pos+=c;cnt++;
+            if(out.length>=limit)return out}
+          for(let q=x;q<=x;q++)known[n][q-1]=true;x++;
+        }else{
+          let cum=rem,j=x;
+          while(j+1<=end&&cum+W[n][j]<=1.3*B){j++;cum+=W[n][j-1]}
+          out.push({n,a:x,b:j,words:cum,pos:wd?[wd+1,tot]:null,tot,fin:true,phase:cnt<P1?1:2,runEnd:false});cnt++;
+          for(let q=x;q<=j;q++)known[n][q-1]=true;x=j+1;
+          if(out.length>=limit)return out}
+      }
+      if(out.length)out[out.length-1].runEnd=true;
+      i=end+1}
+  }
+  return out}
+
+/* ---------- ranges text ---------- */
+function mergeRanges(items){const out=[];items.forEach(l=>{const last=out[out.length-1];if(last&&last[0]===l.n&&l.a<=last[2]+1)last[2]=Math.max(last[2],l.b);else out.push([l.n,l.a,l.b])});return out}
+function rangesText(items){return mergeRanges(items).map(([n,a,b])=>a===b?n+':'+a:n+':'+a+'–'+b).join(' · ')}
+function fmtPool(items){
+  const m=mergeRanges(items),out=[];let run=[];
+  const flush=()=>{if(!run.length)return;out.push(run.length===1?'Surah '+run[0]:(run[run.length-1]-run[0]===run.length-1?'Surah '+run[0]+'–'+run[run.length-1]:'Surah '+run.join(', ')));run=[]};
+  m.forEach(([n,a,b])=>{if(a===1&&b===len(n)){if(run.length&&n!==run[run.length-1]+1)flush();run.push(n)}else{flush();out.push(n+':'+a+(a===b?'':'–'+b))}});
+  flush();return out.join(', ')}
+
+/* ---------- pool (old revision cycle) ---------- */
+function buildBasePool(){const pool=[];for(let n=1;n<=114;n++){const k=parseRanges(state.base[n],len(n));let i=1;while(i<=len(n)){if(!k[i-1]){i++;continue}let j=i;while(j+1<=len(n)&&k[j])j++;pool.push({n,a:i,b:j,words:sumW(n,i,j)});i=j+1}}return pool}
+function ensurePool(){
+  if(!state.pool){state.pool=buildBasePool();state.ptr=0}
+  const t=fromIso(todayIso());let pos=state.pool.length?state.ptr%(state.pool.length+1):0,ins=0;
+  state.log.forEach(e=>{if(e.inPool)return;if(!e.fin){e.inPool=true;return}
+    if((t-fromIso(e.date))/864e5>=8){state.pool.splice(pos+ins,0,{n:e.n,a:e.a,b:e.b,words:sumW(e.n,e.a,e.b)});ins++;e.inPool=true}});
+  if(ins&&state.pool.length>ins&&pos<=state.ptr&&state.ptr>=pos)state.ptr+=0;
+}
+function takeManzil(){
+  const pool=state.pool;if(!pool.length)return{items:[],start:0,end:0,words:0};
+  const BUD=state.settings.manzilMin*0.55*PG;let ptr=state.ptr%pool.length,got=[],tot=0;const start=ptr;
+  for(let c=0;c<pool.length;c++){const it=pool[ptr%pool.length];if(got.length&&(tot>=BUD||tot+it.words>BUD*1.3))break;got.push(it);tot+=it.words;ptr=(ptr+1)%pool.length}
+  return{items:got,start,end:ptr,words:tot}}
+
+/* ---------- today's card ---------- */
+function makeCard(prev){
+  const today=todayIso();ensurePool();
+  const rest=new Date().getDay()===state.settings.restDay&&!state.restOverride[today]&&state.settings.restDay>=0;
+  const card={date:today,rest,lesson:null,commit:null,ticks:{new:false,sabqi:false,manzil:false},sabqi:'',manzil:null};
+  const recent=state.log.filter(e=>e.date!==today||(prev&&false)).slice(-7);
+  card.sabqi=recent.length?rangesText(recent):'';
+  if(prev&&prev.date===today){card.ticks.sabqi=prev.ticks.sabqi;card.ticks.manzil=prev.ticks.manzil;card.manzil=prev.manzil;card.sabqi=prev.sabqi}
+  else{const m=takeManzil();card.manzil={text:fmtPool(m.items),pages:m.words/PG,start:m.start,end:m.end}}
+  if(!rest){const l=genLessons(state,1)[0];card.lesson=l||null}
+  return card}
+function currentCard(){const today=todayIso();if(!state.card||state.card.date!==today){state.card=makeCard(null);save()}return state.card}
+function setHistory(card){const h=state.history[card.date]||(state.history[card.date]={});h.sabqi=card.ticks.sabqi;h.manzil=card.ticks.manzil;h.new=card.ticks.new||h.new||false;if(card.lesson&&card.ticks.new)h.lesson=labelOf(card.lesson)}
+function toggle(kind){
+  const c=currentCard();const was=c.ticks[kind];c.ticks[kind]=!was;
+  if(kind==='new'){
+    if(!was){const l=c.lesson;if(!l){c.ticks.new=false;return}
+      const e={id:Date.now()+''+Math.random().toString(36).slice(2,6),date:c.date,n:l.n,a:l.a,b:l.b,words:l.words,fin:l.fin,inPool:false};state.log.push(e);c.commit=e.id}
+    else{state.log=state.log.filter(e=>e.id!==c.commit);c.commit=null;const h=state.history[c.date];if(h){h.new=false;delete h.lesson}}
+    cache=null}
+  if(kind==='manzil'){if(c.manzil&&state.pool&&state.pool.length)state.ptr=c.ticks.manzil?c.manzil.end:c.manzil.start}
+  setHistory(c);save()}
+
+/* ---------- estimates ---------- */
+function plan(){const key=JSON.stringify([state.base,state.settings,state.log.length]);if(cache&&cacheKey===key)return cache;
+  const all=genLessons(state,1e9);const t=new Date();let d=new Date(t.getFullYear(),t.getMonth(),t.getDate());
+  const c=state.card;if(c&&c.date===todayIso()&&c.commit)d=addDays(d,1);
+  const rd=state.settings.restDay;const dates=[];
+  for(let i=0;i<all.length;i++){while(d.getDay()===rd)d=addDays(d,1);dates.push(new Date(d));d=addDays(d,1)}
+  cache={all,dates};cacheKey=key;return cache}
+function span(d0,d1){let m=Math.round((d1-d0)/864e5/30.44);const y=Math.floor(m/12);m%=12;return (y?y+' year'+(y>1?'s':''):'')+(y&&m?' ':'')+(m?m+' month'+(m>1?'s':''):'')||'under a month'}
+function knownStats(){const {known}=computeKnown(state.base,state.log);let w=0;const frac={};for(let n=1;n<=114;n++){let k=0,ww=0;known[n].forEach((v,i)=>{if(v){k++;ww+=W[n][i]}});w+=ww;frac[n]=k/len(n)}
+  return{words:w,frac,known}}
+
+/* ---------- Quran text + audio ---------- */
+async function surahText(n){const k='hifz-q-'+n;try{const c=localStorage.getItem(k);if(c)return JSON.parse(c)}catch(e){}
+  const r=await fetch('https://api.alquran.cloud/v1/surah/'+n+'/quran-uthmani');if(!r.ok)throw new Error('network');const j=await r.json();
+  const strip=t=>t.replace(/[ً-ٰٟۖ-ۭ]/g,'');
+  const arr=j.data.ayahs.map(a=>{let t=a.text.replace(/﻿/g,'').trim();if(a.numberInSurah===1&&n!==1){const w=t.split(/\s+/);if(strip(w[0])==='بسم')t=w.slice(4).join(' ')}return t});
+  try{localStorage.setItem(k,JSON.stringify(arr))}catch(e){}return arr}
+let audio=null,audioTok=0;
+function stopAudio(){audioTok++;if(audio){audio.pause();audio=null}const s=$('#playstate');if(s)s.textContent=''}
+function playLesson(l,reps){stopAudio();const tok=audioTok;const list=[];for(let r=0;r<reps;r++)for(let a=l.a;a<=l.b;a++)list.push([a,r+1]);let i=0;
+  const next=()=>{if(tok!==audioTok)return;if(i>=list.length){const s=$('#playstate');if(s)s.textContent='Done ✓';return}
+    const [a,r]=list[i++];const url='https://everyayah.com/data/Alafasy_128kbps/'+String(l.n).padStart(3,'0')+String(a).padStart(3,'0')+'.mp3';
+    audio=new Audio(url);const s=$('#playstate');if(s)s.textContent='Playing ayah '+a+' · repeat '+r+'/'+reps;audio.onended=next;audio.onerror=()=>{const s=$('#playstate');if(s)s.textContent='Could not load audio (check your internet).'};audio.play().catch(()=>{})};next()}
+async function showText(l){const box=$('#textbox');if(!box)return;box.innerHTML='<span class="mut">Loading…</span>';
+  try{const arr=await surahText(l.n);let h='';for(let a=l.a;a<=l.b;a++){const words=arr[a-1].split(/\s+/);
+      h+=words.map((w,i)=>{const hl=l.pos&&i+1>=l.pos[0]&&i+1<=l.pos[1];return hl?'<span class="hl">'+esc(w)+'</span>':esc(w)}).join(' ')+' <span class="num">﴿'+a+'﴾</span> '}
+    box.innerHTML='<div class="arabic">'+h+'</div>'+(l.pos?'<div class="mut">Highlighted: the part for today (approximate).</div>':'')}
+  catch(e){box.innerHTML='<span class="mut">Could not load the text. Check your internet connection (needed only for the text and audio).</span>'}}
+
+/* ---------- views ---------- */
+function streak(){let n=0,d=new Date();const hasDone=s=>{const h=state.history[s];return h&&(h.new||h.sabqi||h.manzil)};
+  if(!hasDone(iso(d)))d=addDays(d,-1);
+  for(let i=0;i<4000;i++){const s=iso(d);if(hasDone(s))n++;else if(d.getDay()===state.settings.restDay&&state.settings.restDay>=0){}else break;d=addDays(d,-1)}return n}
+function viewToday(){
+  const c=currentCard();const p=plan();const t=new Date();
+  let h='';
+  if(c.rest){
+    const weak=Object.keys(state.conf).filter(n=>state.conf[n]==='weak').map(Number).sort((a,b)=>a-b);
+    h+=`<div class="card"><h2>${DAYS[t.getDay()]} · rest day</h2><div class="big">No new lesson today</div><p class="mut">Spend your 30 minutes on revision: weak spots, and anything you missed this week.</p>
+    <p><b>Weak surahs:</b> ${weak.length?weak.map(n=>esc(NAMES[n])+' ('+n+')').join(', '):'none marked yet. Mark them in the Revision tab.'}</p>
+    <button data-a="learnanyway">Learn a new lesson anyway</button></div>`;
+    h+=revCards(c,true);return h}
+  if(!c.lesson&&!c.commit){h+=`<div class="card"><div class="big">Alhamdulillah 🎉</div><p>No more lessons left in your plan. Keep revising.</p></div>`+revCards(c,false);return h}
+  const l=c.lesson;
+  h+=`<div class="card"><h2>Today · ${esc(fmtDate(t))}</h2><div class="row"><span class="tag">New lesson</span><span class="mut">about 12 min</span>${l.phase===2?'<span class="tag">pace 2</span>':''}</div>
+  <div class="big" style="margin:8px 0">${esc(labelOf(l))}</div>
+  <div class="mut">${l.words} words · learn: listen 3× → read 10× → recite 10× from memory → link to the previous lesson.</div>
+  <div class="row" style="margin-top:10px"><button data-a="text">Show text</button><button data-a="play">▶ Listen</button><select id="reps" style="width:auto"><option>1</option><option selected>3</option><option>5</option><option>10</option></select><span class="mut">times</span><button data-a="stop" class="sm">Stop</button></div>
+  <div class="mut" id="playstate" style="margin-top:6px"></div><div id="textbox" style="margin-top:8px"></div>
+  <div style="margin-top:10px">${tickBtn('new','I learned today’s new lesson',c.ticks.new)}</div></div>`;
+  h+=revCards(c,false);
+  const done=c.ticks.new&&c.ticks.sabqi&&c.ticks.manzil;
+  if(done)h+=`<div class="card" style="border-color:var(--ok)"><div class="big">✅ Today is done. Jazakallah khairan.</div><p class="mut">Tomorrow morning, recite today’s lesson from memory BEFORE looking. If you stumble, repeat it instead of moving on.</p><button data-a="extra">Learn another lesson today</button></div>`;
+  if(p.all.length>1){h+=`<div class="card"><h2>Coming up</h2>`+p.all.slice(c.commit?0:1,(c.commit?0:1)+3).map((x,i)=>{const di=(c.commit?0:1)+i;return `<div class="list-item"><div class="grow">${esc(labelOf(x))}</div><div class="mut">${esc(p.dates[di].toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short'}))}</div></div>`}).join('')+`</div>`}
+  return h}
+function tickBtn(k,label,on){return `<button class="tick ${on?'on':''}" data-a="tick" data-k="${k}"><span class="box">${on?'✓':''}</span><span>${label}</span></button>`}
+function revCards(c,rest){
+  let h='';
+  h+=`<div class="card"><div class="row"><span class="tag">Recent · Sabqi</span><span class="mut">about 8 min</span></div>
+  <div class="big" style="margin:8px 0">${c.sabqi?esc(c.sabqi):'<span class="mut">Nothing yet. This fills in after your first lessons.</span>'}</div>
+  <div class="mut">Your last 7 new lessons, from memory.</div><div style="margin-top:10px">${tickBtn('sabqi','Done',c.ticks.sabqi)}</div></div>`;
+  if(!rest){
+    const m=c.manzil;const long=m&&m.pages>state.settings.manzilMin*0.55*1.3;
+    h+=`<div class="card"><div class="row"><span class="tag">Old · Manzil</span><span class="mut">about ${state.settings.manzilMin} min · ${m?m.pages.toFixed(1):0} pages</span>${long?'<span class="tag warn">long day</span>':''}</div>
+    <div class="big" style="margin:8px 0">${m&&m.text?esc(m.text):'<span class="mut">Nothing to revise yet.</span>'}</div>
+    <div class="mut">Everything you know is revised in a rotating cycle. Each new lesson joins the cycle after 8 days.</div><div style="margin-top:10px">${tickBtn('manzil','Done',c.ticks.manzil)}</div></div>`}
+  return h}
+function viewPlan(){
+  const p=plan();const shown=window._planN||30;
+  let h=`<div class="card"><h2>Plan</h2><div class="big">${p.all.length} lessons left</div><div class="mut">${p.all.length?'Estimated finish: <b>'+esc(p.dates[p.dates.length-1].toLocaleDateString(undefined,{month:'long',year:'numeric'}))+'</b> ('+esc(span(new Date(),p.dates[p.dates.length-1]))+' from now). Missed days only push it later; nothing is skipped.':''}</div></div>`;
+  h+='<div class="card">';
+  p.all.slice(0,shown).forEach((x,i)=>{h+=`<div class="list-item"><div class="grow"><div>${esc(labelOf(x))}</div><div class="mut">${esc(NAMES[x.n])}${x.runEnd&&x.b===len(x.n)&&x.fin?' · 🎉 finishes the surah':''}</div></div><div class="mut">${esc(p.dates[i].toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short',year:'2-digit'}))}</div></div>`});
+  if(shown<p.all.length)h+=`<button data-a="more" style="margin-top:8px">Show more</button>`;
+  return h+'</div>'}
+function viewRevision(){
+  const {known}=knownStats();const flt=window._revFlt||'all';
+  let h=`<div class="card"><h2>Everything you know</h2><div class="mut">Mark how sure you are. “Weak” surahs show up on rest days. Tap “Revised today” to remember when you last recited it.</div>
+  <div class="seg" style="margin-top:8px"><button data-a="flt" data-v="all" class="sm ${flt==='all'?'on':''}">All</button><button data-a="flt" data-v="weak" class="sm ${flt==='weak'?'on':''}">Weak only</button></div></div><div class="card">`;
+  let cnt=0;
+  for(let n=1;n<=114;n++){const k=known[n];if(!k.some(Boolean))continue;if(flt==='weak'&&state.conf[n]!=='weak')continue;cnt++;
+    const runs=[];let i=1;while(i<=len(n)){if(!k[i-1]){i++;continue}let j=i;while(j+1<=len(n)&&k[j])j++;runs.push(i===j?i:i+'–'+j);i=j+1}
+    const full=runs.length===1&&runs[0]===(len(n)===1?1:'1–'+len(n));
+    const c=state.conf[n]||'';
+    h+=`<div class="list-item" style="align-items:flex-start"><div class="grow"><b>${n}. ${esc(NAMES[n])}</b><div class="mut">${full?'Whole surah':'Ayat '+runs.join(', ')} · last: ${state.revised[n]?esc(fromIso(state.revised[n]).toLocaleDateString(undefined,{day:'numeric',month:'short'})):'—'}</div>
+    <div class="seg" style="margin-top:6px">${['strong','ok','weak'].map(v=>`<button class="sm ${c===v?'on':''}" data-a="conf" data-n="${n}" data-v="${v}">${v[0].toUpperCase()+v.slice(1)}</button>`).join('')}<button class="sm" data-a="rev" data-n="${n}">Revised today</button></div></div></div>`}
+  if(!cnt)h+='<div class="mut">Nothing here yet.</div>';
+  return h+'</div>'}
+function viewProgress(){
+  const st=knownStats();const p=plan();
+  const pct=st.words/TOTAL;
+  let h=`<div class="card"><h2>Memorized</h2><div class="big">${(pct*100).toFixed(1)}% of the Quran</div><div class="bar" style="margin:8px 0"><i style="width:${(pct*100).toFixed(1)}%"></i></div>
+  <div class="stats"><div class="stat"><b>${(pct*604).toFixed(1)}</b>pages (of 604)</div><div class="stat"><b>${state.log.length}</b>lessons learned here</div><div class="stat"><b>${streak()}</b>day streak 🔥</div><div class="stat"><b>${p.all.length?esc(p.dates[p.dates.length-1].toLocaleDateString(undefined,{month:'short',year:'numeric'})):'Done'}</b>estimated finish</div></div></div>`;
+  h+=`<div class="card"><h2>Surah map</h2><div class="grid">`;
+  for(let n=1;n<=114;n++){const f=st.frac[n];const bg=f===0?'':`background:color-mix(in srgb,var(--pri) ${Math.round(20+f*80)}%,transparent)`;h+=`<i style="${bg}" title="${esc(NAMES[n])} · ${Math.round(f*100)}%">${n}</i>`}
+  h+=`</div><div class="mut" style="margin-top:6px">Darker = more of the surah memorized.</div></div>`;
+  return h}
+function setupForm(first){
+  const d=draft;const s=d.settings;const est=(()=>{const tmp=Object.assign({},state,{base:d.base,settings:s});const all=genLessons(tmp,1e9);let days=0,dd=new Date();for(let i=0;i<all.length;i++){while(dd.getDay()===s.restDay)dd=addDays(dd,1);dd=addDays(dd,1)}return{n:all.length,end:dd}})();
+  let h='';
+  if(first)h+=`<div class="card"><div class="big">Bismillah 🌙</div><p>A calm hifz plan for <b>30 minutes a day</b>: ~12 min new lesson, ~8 min recent, ~10 min old revision. Your progress is saved <b>only on this device</b>. No account needed.</p></div>`;
+  h+=`<div class="card"><h2>1. What do you already know?</h2><div class="mut">Tick surahs you have fully memorized. For partial surahs, type the ayat, e.g. <i>1-20</i> or <i>1-10, 15</i>.</div>
+  <div class="row" style="margin:8px 0"><button class="sm" data-a="juz30">Juz 30 (78–114)</button><button class="sm" data-a="clearm">Clear all</button></div>
+  <div class="scroll" id="mlist">${[...Array(114)].map((_,i)=>{const n=i+1,v=d.base[n]||'';return `<div class="msurah"><input type="checkbox" data-a="mchk" data-n="${n}" ${v==='all'?'checked':''}><div>${n}. ${esc(NAMES[n])} <span class="mut">(${len(n)} ayat)</span></div><span></span><input type="text" data-a="mtxt" data-n="${n}" placeholder="partial: ayat" value="${v==='all'?'':esc(v)}" ${v==='all'?'disabled':''}></div>`}).join('')}</div></div>`;
+  h+=`<div class="card"><h2>2. Order</h2><div class="seg">${[['easy','Easy & important first (recommended)'],['mushaf','From Al-Baqarah forward'],['reverse','From An-Nas backward']].map(([v,t])=>`<button class="sm ${s.order===v?'on':''}" data-a="order" data-v="${v}">${t}</button>`).join('')}</div>
+  <div class="mut" style="margin-top:6px">“Easy & important first” starts with Al-Fatiha and Juz 30, then Al-Mulk, Al-Qalam, Ayat al-Kursi, and works backward through the Quran, leaving Al-Baqarah for last.</div></div>`;
+  h+=`<div class="card"><h2>3. Pace</h2>
+  <label>Lesson size (words). One lesson is about 12 words, the length of 2:4. Longer ayat are split over several days.</label><input type="number" min="6" max="40" data-a="unit" value="${s.unitWords}">
+  <label>Lessons per day for the first weeks</label><select data-a="p1u"><option value="0.5" ${s.p1Units==0.5?'selected':''}>Half a lesson</option><option value="1" ${s.p1Units==1?'selected':''}>1 lesson</option><option value="1.5" ${s.p1Units==1.5?'selected':''}>1.5 lessons</option><option value="2" ${s.p1Units==2?'selected':''}>2 lessons</option></select>
+  <label>How many weeks at that pace</label><input type="number" min="0" max="520" data-a="p1w" value="${s.p1Weeks}">
+  <label>Lessons per day after that</label><select data-a="p2u"><option value="1" ${s.p2Units==1?'selected':''}>1 lesson</option><option value="1.5" ${s.p2Units==1.5?'selected':''}>1.5 lessons</option><option value="2" ${s.p2Units==2?'selected':''}>2 lessons</option><option value="3" ${s.p2Units==3?'selected':''}>3 lessons</option></select>
+  <label>Rest day (no new lesson)</label><select data-a="rest"><option value="-1" ${s.restDay==-1?'selected':''}>None</option>${DAYS.map((x,i)=>`<option value="${i}" ${s.restDay==i?'selected':''}>${x}</option>`).join('')}</select>
+  <label>Minutes for old revision (Manzil) each day</label><input type="number" min="5" max="60" data-a="mmin" value="${s.manzilMin}">
+  <div class="est">${est.n} lessons to go · estimated finish ${esc(est.end.toLocaleDateString(undefined,{month:'long',year:'numeric'}))} (${esc(span(new Date(),est.end))})</div></div>`;
+  h+=`<div class="card"><label>Your name (optional)</label><input type="text" data-a="name" value="${esc(d.name||'')}" placeholder="shown on the top bar"></div>`;
+  h+=`<button class="pri" data-a="savesetup" style="width:100%;padding:14px">${first?'Start my plan':'Save changes'}</button>`;
+  if(!first)h+=`<div style="height:8px"></div><button data-a="cancelsetup" style="width:100%">Cancel</button>`;
+  return h}
+function viewSettings(){
+  if(draft)return setupForm(false);
+  const s=state.settings;
+  return `<div class="card"><h2>Settings</h2><button data-a="editsetup" style="width:100%">Edit memorized surahs, order and pace</button>
+  <label>Appearance</label><select data-a="theme"><option value="auto" ${s.theme==='auto'?'selected':''}>Match my phone</option><option value="light" ${s.theme==='light'?'selected':''}>Light</option><option value="dark" ${s.theme==='dark'?'selected':''}>Dark</option></select></div>
+  <div class="card"><h2>Share with friends</h2><p class="mut">Everyone gets their own private plan on their own device.</p><button data-a="share">Share this app</button> <button data-a="install">How to install on my phone</button><div id="installhelp" class="mut hidden" style="margin-top:8px"><b>iPhone:</b> open in Safari → Share → Add to Home Screen.<br><b>Android:</b> open in Chrome → ⋮ menu → Add to Home screen / Install app.</div></div>
+  <div class="card"><h2>Backup</h2><p class="mut">Your data lives only in this browser. Export a backup now and then, especially before clearing browser data or changing phone.</p><div class="row"><button data-a="export">Export backup</button><button data-a="import">Import backup</button><input type="file" id="file" accept="application/json" class="hidden"></div></div>
+  <div class="card"><h2>Reset</h2><button data-a="reset" style="color:var(--bad)">Erase everything on this device</button></div>
+  <div class="card mut">Word counts come from the Arabic text, so “pages” are estimates. Arabic text from api.alquran.cloud and audio from everyayah.com (Mishary Alafasy) are loaded only when you tap them.</div>`}
+
+/* ---------- render ---------- */
+const TABS=[['today','☀️','Today'],['plan','🗓️','Plan'],['rev','🔁','Revision'],['prog','📈','Progress'],['set','⚙️','Settings']];
+function applyTheme(){const t=state.settings.theme;if(t==='auto')document.documentElement.removeAttribute('data-theme');else document.documentElement.setAttribute('data-theme',t)}
+function render(){
+  applyTheme();const app=$('#app');
+  if(!state.setup){if(!draft)draft=JSON.parse(JSON.stringify({base:state.base,settings:state.settings,name:state.name}));app.innerHTML=setupForm(true);$('#nav').innerHTML='';$('#sub').textContent='Set up your plan';return}
+  $('#sub').textContent=(state.name?esc(state.name)+' · ':'')+new Date().toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long'});
+  $('#nav').innerHTML=TABS.map(([k,i,t])=>`<button data-a="tab" data-v="${k}" class="${tab===k?'on':''}"><span class="ic">${i}</span>${t}</button>`).join('');
+  const v={today:viewToday,plan:viewPlan,rev:viewRevision,prog:viewProgress,set:viewSettings}[tab];
+  const y=window.scrollY;app.innerHTML=v();window.scrollTo(0,y)}
+function refreshEst(){const e=$('.est');if(!e||!draft)return;const s=draft.settings;const tmp=Object.assign({},state,{base:draft.base,settings:s});const all=genLessons(tmp,1e9);let dd=new Date();for(let i=0;i<all.length;i++){while(dd.getDay()===s.restDay)dd=addDays(dd,1);dd=addDays(dd,1)}
+  e.textContent=all.length+' lessons to go · estimated finish '+dd.toLocaleDateString(undefined,{month:'long',year:'numeric'})+' ('+span(new Date(),dd)+')'}
+
+document.addEventListener('click',async ev=>{
+  const t=ev.target.closest('[data-a]');if(!t)return;const a=t.dataset.a;
+  if(['mchk','mtxt','unit','p1u','p1w','p2u','rest','mmin','name','theme'].includes(a))return;
+  const n=+t.dataset.n,v=t.dataset.v;
+  switch(a){
+    case 'tab':tab=v;stopAudio();window.scrollTo(0,0);break;
+    case 'tick':toggle(t.dataset.k);break;
+    case 'text':{const c=currentCard();showText(c.lesson);return}
+    case 'play':{const c=currentCard();playLesson(c.lesson,+$('#reps').value);return}
+    case 'stop':stopAudio();return;
+    case 'extra':{const prev=state.card;state.card=makeCard(prev);state.card.ticks.new=false;save();break}
+    case 'learnanyway':state.restOverride[todayIso()]=true;state.card=makeCard(state.card);save();break;
+    case 'more':window._planN=(window._planN||30)+40;break;
+    case 'flt':window._revFlt=v;break;
+    case 'conf':state.conf[n]=state.conf[n]===v?'':v;save();break;
+    case 'rev':state.revised[n]=todayIso();save();break;
+    case 'juz30':for(let i=78;i<=114;i++)draft.base[i]='all';keepScroll();return;
+    case 'clearm':draft.base={};keepScroll();return;
+    case 'order':draft.settings.order=v;keepScroll();return;
+    case 'savesetup':{
+      const first=!state.setup;state.base=draft.base;state.settings=draft.settings;state.name=draft.name||'';
+      if(first){state.setup=true;state.startDate=todayIso()}
+      state.pool=null;state.ptr=0;state.log.forEach(e=>e.inPool=false);
+      // pool rebuilt from base only: log entries older than 8 days will re-enter
+      state.card=null;cache=null;draft=null;tab='today';save();break}
+    case 'cancelsetup':draft=null;break;
+    case 'editsetup':draft=JSON.parse(JSON.stringify({base:state.base,settings:state.settings,name:state.name}));break;
+    case 'share':{const u=location.href.split('#')[0];try{if(navigator.share){await navigator.share({title:'Hifz Planner',text:'A free daily Quran memorization planner',url:u});return}}catch(e){}try{await navigator.clipboard.writeText(u);alert('Link copied:\n'+u)}catch(e){prompt('Copy this link:',u)}return}
+    case 'install':$('#installhelp').classList.toggle('hidden');return;
+    case 'export':{const b=new Blob([JSON.stringify(state)],{type:'application/json'});const a2=document.createElement('a');a2.href=URL.createObjectURL(b);a2.download='hifz-backup-'+todayIso()+'.json';a2.click();return}
+    case 'import':$('#file').click();return;
+    case 'reset':if(confirm('Erase all your hifz data on this device? This cannot be undone.')){localStorage.removeItem(LS);state=defState();draft=null;cache=null;tab='today'}else return;break;
+  }
+  render()});
+function keepScroll(){const m=$('#mlist');const y=m?m.scrollTop:0,wy=window.scrollY;render();const m2=$('#mlist');if(m2)m2.scrollTop=y;window.scrollTo(0,wy)}
+document.addEventListener('change',ev=>{
+  const t=ev.target;if(t.id==='file'){const f=t.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const s=JSON.parse(r.result);if(s.v!==1)throw 0;state=Object.assign(defState(),s);save();cache=null;draft=null;render();alert('Backup restored ✓')}catch(e){alert('That file is not a valid backup.')}};r.readAsText(f);return}
+  const a=t.dataset.a;if(!a)return;
+  if(a==='theme'){state.settings.theme=t.value;save();render();return}
+  if(!draft)return;const s=draft.settings;
+  if(a==='mchk'){const n=+t.dataset.n;draft.base[n]=t.checked?'all':'';keepScroll();return}
+  if(a==='mtxt'){const n=+t.dataset.n;draft.base[n]=t.value.trim();const chk=t.closest('.msurah').querySelector('[data-a=mchk]');chk.checked=false;refreshEst();return}
+  if(a==='unit')s.unitWords=Math.max(6,Math.min(40,+t.value||12));
+  if(a==='p1u')s.p1Units=+t.value;if(a==='p1w')s.p1Weeks=Math.max(0,+t.value||0);if(a==='p2u')s.p2Units=+t.value;
+  if(a==='rest')s.restDay=+t.value;if(a==='mmin')s.manzilMin=Math.max(5,+t.value||10);if(a==='name')draft.name=t.value;
+  refreshEst()});
+document.addEventListener('input',ev=>{const t=ev.target;if(t.dataset.a==='mtxt'&&draft){draft.base[+t.dataset.n]=t.value.trim()}});
+if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+window.__hifz={get state(){return state},genLessons,plan:()=>plan(),TOTAL,render};
+render();
+})();
+</script>
+</body>
+</html>
