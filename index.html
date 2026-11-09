@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Hifz Planner</title>
 <meta name="description" content="A free daily Quran memorization (hifz) planner: new lesson, recent revision and old revision in 30 minutes a day.">
-<meta name="theme-color" content="#14633b">
+<meta name="theme-color" content="#3b528b">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-180.png">
@@ -13,20 +13,21 @@
 <meta name="mobile-web-app-capable" content="yes">
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f4f7f5;--card:#fff;--ink:#16231c;--mut:#5d6b63;--line:#dfe7e2;--pri:#14633b;--pri2:#e6f2ea;--gold:#c8991c;--gold2:#fff6d9;--shadow:0 1px 2px rgba(10,40,25,.06),0 6px 18px rgba(10,40,25,.07);--warn:#b26a00;--warnbg:#fff3df;--ok:#1b8a4f;--bad:#b3261e;--hl:#fff1a8}
-@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0f1713;--card:#18231d;--ink:#e8f0eb;--mut:#9fb1a6;--line:#2a3a32;--pri:#4fb783;--pri2:#1f3329;--warnbg:#3a2c12;--hl:#5b4d10;--gold2:#2e2711;--shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25)}}
-:root[data-theme=dark]{--bg:#0f1713;--card:#18231d;--ink:#e8f0eb;--mut:#9fb1a6;--line:#2a3a32;--pri:#4fb783;--pri2:#1f3329;--warnbg:#3a2c12;--hl:#5b4d10;--gold2:#2e2711;--shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25)}
+:root{--bg:#f5f4f8;--card:#fff;--ink:#1d1830;--mut:#5f5b73;--line:#e2dfee;--pri:#26828e;--onpri:#fff;--pri2:#e6f0f4;--gold:#e8cf10;--gold2:#fffbd9;--shadow:0 1px 2px rgba(40,20,70,.06),0 6px 18px rgba(40,20,70,.08);--warn:#9a5b00;--warnbg:#fff3df;--ok:#2a9d5c;--bad:#b3261e;--hl:#fff1a8}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#100a18;--card:#1a1326;--ink:#ede9f6;--mut:#aaa3c0;--line:#30264a;--pri:#35b779;--onpri:#100a18;--pri2:#1c2a3c;--warnbg:#3a2c12;--hl:#5b4d10;--gold:#fde725;--gold2:#27230f;--ok:#35b779;--shadow:0 1px 2px rgba(0,0,0,.35),0 6px 18px rgba(0,0,0,.3)}}
+:root[data-theme=dark]{--bg:#100a18;--card:#1a1326;--ink:#ede9f6;--mut:#aaa3c0;--line:#30264a;--pri:#35b779;--onpri:#100a18;--pri2:#1c2a3c;--warnbg:#3a2c12;--hl:#5b4d10;--gold:#fde725;--gold2:#27230f;--ok:#35b779;--shadow:0 1px 2px rgba(0,0,0,.35),0 6px 18px rgba(0,0,0,.3)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;padding-bottom:84px}
-header{background:linear-gradient(135deg,#0b3f27 0%,#14633b 55%,#1d8a57 100%);color:#fff;padding:max(12px,env(safe-area-inset-top)) 16px 0;position:relative;z-index:5;box-shadow:0 4px 16px rgba(5,30,18,.25);overflow:hidden}
+header{background:linear-gradient(135deg,#440154 0%,#3b528b 45%,#21918c 100%);color:#fff;padding:max(12px,env(safe-area-inset-top)) 16px 0;position:relative;z-index:5;box-shadow:0 4px 16px rgba(30,10,60,.3);overflow:hidden}
+header:after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;background:linear-gradient(90deg,#440154,#482878,#3e4989,#31688e,#26828e,#1f9e89,#35b779,#6ece58,#b5de2b,#fde725)}
 header:before{content:"";position:absolute;inset:0;opacity:.09;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cpath d='M24 4l5 11 11-5-5 11 11 5-11 5 5 11-11-5-5 11-5-11-11 5 5-11-11-5 11-5-5-11 11 5z' fill='none' stroke='white' stroke-width='1.2'/%3E%3C/svg%3E");pointer-events:none}
 .hrow{position:relative;display:flex;align-items:center;gap:12px;max-width:640px;margin:0 auto}
 .hrow svg{width:46px;height:46px;flex:none;filter:drop-shadow(0 3px 6px rgba(0,0,0,.35))}
 header h1{margin:0;font-size:22px;font-weight:700;font-family:"Amiri",Georgia,serif;letter-spacing:.2px;line-height:1.1}
-header h1 small{font-weight:400;font-size:15px;color:#ffe08a;margin-left:6px}
+header h1 small{font-weight:400;font-size:15px;color:#fde725;margin-left:6px}
 header .sub{font-size:13px;opacity:.9}
-.tip{position:relative;max-width:640px;margin:10px auto 0;padding:7px 0 9px;font-size:12.5px;line-height:1.35;border-top:1px solid rgba(255,255,255,.18);color:#eaf6ee}
-.tip a{color:#ffe08a;font-weight:700;text-decoration:none;border-bottom:1px dotted #ffe08a;white-space:nowrap}
+.tip{position:relative;max-width:640px;margin:10px auto 0;padding:7px 0 9px;font-size:12.5px;line-height:1.35;border-top:1px solid rgba(255,255,255,.18);color:#f1eefa;padding-bottom:12px}
+.tip a{color:#fde725;font-weight:700;text-decoration:none;border-bottom:1px dotted #fde725;white-space:nowrap}
 main{max-width:640px;margin:0 auto;padding:12px 16px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin:0 0 14px;box-shadow:var(--shadow)}
 .card.lesson{border-left:5px solid var(--gold);background:linear-gradient(180deg,var(--gold2),var(--card) 55%)}
@@ -38,7 +39,7 @@ main{max-width:640px;margin:0 auto;padding:12px 16px}
 .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .grow{flex:1}
 button,.btn{font:inherit;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 14px;border-radius:10px;cursor:pointer}
-button.pri{background:linear-gradient(135deg,#0f5a35,#1d8a57);color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(20,99,59,.35);font-weight:700}
+button.pri{background:linear-gradient(135deg,#440154,#3b528b 50%,#21918c);color:#fff;border-color:transparent;box-shadow:0 4px 14px rgba(59,82,139,.4);font-weight:700}
 button{transition:transform .08s,background .15s}button:active{transform:scale(.97)}
 :root[data-theme=dark] button.pri,@media (prefers-color-scheme:dark){}
 button.sm{padding:5px 10px;font-size:14px}
@@ -53,17 +54,17 @@ button:disabled{opacity:.5}
 .arabic{font-family:"Amiri","Scheherazade New","Traditional Arabic",serif;font-size:28px;line-height:2.2;direction:rtl;text-align:right}
 .arabic .hl{background:var(--hl);border-radius:6px}
 .arabic .num{font-size:20px;color:var(--pri);margin:0 4px}
-nav{position:fixed;bottom:0;left:0;right:0;background:color-mix(in srgb,var(--card) 92%,transparent);backdrop-filter:blur(12px);border-top:1px solid var(--line);box-shadow:0 -6px 20px rgba(10,40,25,.08);display:flex;z-index:6;padding-bottom:env(safe-area-inset-bottom)}
+nav{position:fixed;bottom:0;left:0;right:0;background:color-mix(in srgb,var(--card) 92%,transparent);backdrop-filter:blur(12px);border-top:1px solid var(--line);box-shadow:0 -6px 20px rgba(40,20,70,.1);display:flex;z-index:6;padding-bottom:env(safe-area-inset-bottom)}
 nav button{flex:1;border:0;border-radius:0;background:none;padding:10px 2px 8px;font-size:12px;color:var(--mut)}
 nav button .ic{display:block;font-size:20px;line-height:1.1}
 nav button.on{color:var(--pri);font-weight:700}
 nav button.on .ic{transform:translateY(-2px) scale(1.15)}nav button .ic{transition:transform .15s}
 label{display:block;font-size:14px;color:var(--mut);margin:10px 0 4px}
 input[type=text],input[type=number],input[type=date],select,textarea{font:inherit;width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
-.ring{--p:0;width:64px;height:64px;border-radius:50%;background:conic-gradient(var(--gold) calc(var(--p)*1%),var(--pri2) 0);display:grid;place-items:center;flex:none}.ring i{width:48px;height:48px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-style:normal;font-weight:700;font-size:15px}
+.ring{--p:0;width:64px;height:64px;border-radius:50%;background:conic-gradient(#440154 0,#3b528b calc(var(--p)*.3%),#21918c calc(var(--p)*.6%),#5ec962 calc(var(--p)*.85%),#fde725 calc(var(--p)*1%),var(--pri2) 0);display:grid;place-items:center;flex:none}.ring i{width:48px;height:48px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-style:normal;font-weight:700;font-size:15px}
 .hello{display:flex;align-items:center;gap:14px}
 .bar{height:12px;background:var(--pri2);border-radius:99px;overflow:hidden}
-.bar i{display:block;height:100%;background:var(--pri)}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#440154,#3b528b,#21918c,#5ec962,#fde725);background-size:var(--bw,100%) 100%}
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .stat{background:var(--pri2);border-radius:12px;padding:10px}
 .stat b{display:block;font-size:20px}
@@ -76,18 +77,17 @@ input[type=text],input[type=number],input[type=date],select,textarea{font:inheri
 .scroll{max-height:340px;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:0 10px}
 .note{background:var(--warnbg);color:var(--warn);padding:10px 12px;border-radius:10px;font-size:14px;margin:0 0 12px}
 .seg{display:flex;gap:6px;flex-wrap:wrap}
-.seg button.on{background:var(--pri);color:#fff;border-color:var(--pri)}
+.seg button.on{background:var(--pri);color:var(--onpri);border-color:var(--pri)}
 .hidden{display:none}
 .est{background:var(--pri2);border-radius:12px;padding:12px;margin:12px 0;font-weight:700}
 </style>
 </head>
 <body>
 <header><div class="hrow"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs>
-<linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0c4026"/><stop offset="1" stop-color="#23925b"/></linearGradient>
-<linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe08a"/><stop offset="1" stop-color="#c8991c"/></linearGradient>
+<linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#440154"/><stop offset=".5" stop-color="#3b528b"/><stop offset="1" stop-color="#21b087"/></linearGradient>
+<linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fde725"/><stop offset=".55" stop-color="#b5de2b"/><stop offset="1" stop-color="#35b779"/></linearGradient>
 <mask id="cm"><rect width="512" height="512" fill="#fff"/><circle cx="286" cy="236" r="52" fill="#000"/></mask>
-</defs>
-<rect width="512" height="512" rx="112" fill="url(#g1)"/><circle cx="256" cy="256" r="236" fill="none" stroke="#fff" stroke-opacity=".12" stroke-width="3"/><g transform="translate(256 256)"><rect x="-150" y="-150" width="300" height="300" rx="14" fill="url(#g2)"/><rect x="-150" y="-150" width="300" height="300" rx="14" fill="url(#g2)" transform="rotate(45)"/><circle r="112" fill="#0c3d25"/><circle r="112" fill="none" stroke="#ffe9a8" stroke-width="5" opacity=".7"/></g><circle cx="256" cy="256" r="58" fill="url(#g2)" mask="url(#cm)" transform="translate(-6 8)"/><path d="M322 176l7 16 17 2-13 11 4 17-15-9-15 9 4-17-13-11 17-2z" fill="#fff" transform="translate(-10 -4) scale(.9)"/></svg><div><h1>Hifz Planner<small>حفظ</small></h1><div class="sub" id="sub"></div></div></div>
+</defs><rect width="512" height="512" rx="112" fill="url(#g1)"/><circle cx="256" cy="256" r="236" fill="none" stroke="#fff" stroke-opacity=".14" stroke-width="3"/><g transform="translate(256 256)"><rect x="-150" y="-150" width="300" height="300" rx="14" fill="url(#g2)"/><rect x="-150" y="-150" width="300" height="300" rx="14" fill="url(#g2)" transform="rotate(45)"/><circle r="112" fill="#2a0a3d"/><circle r="112" fill="none" stroke="#fde725" stroke-width="5" opacity=".75"/></g><circle cx="256" cy="256" r="58" fill="url(#g2)" mask="url(#cm)" transform="translate(-6 8)"/><path d="M322 176l7 16 17 2-13 11 4 17-15-9-15 9 4-17-13-11 17-2z" fill="#fff" transform="translate(-10 -4) scale(.9)"/></svg><div><h1>Hifz Planner<small>حفظ</small></h1><div class="sub" id="sub"></div></div></div>
 <div class="tip">📖 Tip: for reading and listening, we recommend the <b>Al Quran (Tafsir &amp; by Word)</b> app: <a href="https://apps.apple.com/us/app/al-quran-tafsir-by-word/id1437038111" target="_blank" rel="noopener">iPhone</a> · <a href="https://play.google.com/store/apps/details?id=com.greentech.quran" target="_blank" rel="noopener">Android</a></div></header>
 <main id="app"></main>
 <nav id="nav"></nav>
@@ -332,11 +332,12 @@ function viewRevision(){
 function viewProgress(){
   const st=knownStats();const p=plan();
   const pct=st.words/TOTAL;
-  let h=`<div class="card"><h2>Memorized</h2><div class="big">${(pct*100).toFixed(1)}% of the Quran</div><div class="bar" style="margin:8px 0"><i style="width:${(pct*100).toFixed(1)}%"></i></div>
+  let h=`<div class="card"><h2>Memorized</h2><div class="big">${(pct*100).toFixed(1)}% of the Quran</div><div class="bar" style="margin:8px 0"><i style="width:${(pct*100).toFixed(1)}%;--bw:${pct>0?(100/Math.max(pct,0.02)).toFixed(0):100}%"></i></div>
   <div class="stats"><div class="stat"><b>${(pct*604).toFixed(1)}</b>pages (of 604)</div><div class="stat"><b>${state.log.length}</b>lessons learned here</div><div class="stat"><b>${streak()}</b>day streak 🔥</div><div class="stat"><b>${p.all.length?esc(p.dates[p.dates.length-1].toLocaleDateString(undefined,{month:'short',year:'numeric'})):'Done'}</b>estimated finish</div></div></div>`;
   h+=`<div class="card"><h2>Surah map</h2><div class="grid">`;
-  for(let n=1;n<=114;n++){const f=st.frac[n];const bg=f===0?'':`background:color-mix(in srgb,var(--pri) ${Math.round(20+f*80)}%,transparent)`;h+=`<i style="${bg}" title="${esc(NAMES[n])} · ${Math.round(f*100)}%">${n}</i>`}
-  h+=`</div><div class="mut" style="margin-top:6px">Darker = more of the surah memorized.</div></div>`;
+  const VIR=['#440154','#482878','#3e4989','#31688e','#26828e','#1f9e89','#35b779','#6ece58','#b5de2b','#fde725'];
+  for(let n=1;n<=114;n++){const f=st.frac[n];const ci=Math.min(9,Math.floor(f*9.999));const bg=f===0?'':`background:${VIR[ci]};color:${ci>=6?'#1d1830':'#fff'}`;h+=`<i style="${bg}" title="${esc(NAMES[n])} · ${Math.round(f*100)}%">${n}</i>`}
+  h+=`</div><div class="mut" style="margin-top:6px">Purple = just started, green = well along, yellow = complete.</div><div class="bar" style="margin-top:6px;height:8px"><i style="width:100%"></i></div></div>`;
   return h}
 function setupForm(first){
   const d=draft;const s=d.settings;const est=(()=>{const tmp=Object.assign({},state,{base:d.base,settings:s});const all=genLessons(tmp,1e9);const dd0=(d.startDate&&d.startDate>todayIso())?d.startDate:todayIso();let dd=fromIso(dd0);for(let i=0;i<all.length;i++){while(dd.getDay()===s.restDay)dd=addDays(dd,1);dd=addDays(dd,1)}return{n:all.length,end:dd}})();
