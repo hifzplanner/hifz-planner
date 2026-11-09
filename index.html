@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Hifz Planner</title>
 <meta name="description" content="A free daily Quran memorization (hifz) planner: new lesson, recent revision and old revision in 30 minutes a day.">
-<meta name="theme-color" content="#1b5e3b">
+<meta name="theme-color" content="#14633b">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-180.png">
@@ -13,18 +13,24 @@
 <meta name="mobile-web-app-capable" content="yes">
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f4f7f5;--card:#fff;--ink:#16231c;--mut:#5d6b63;--line:#dfe7e2;--pri:#1b5e3b;--pri2:#e6f2ea;--warn:#b26a00;--warnbg:#fff3df;--ok:#1b8a4f;--bad:#b3261e;--hl:#fff1a8}
-@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0f1713;--card:#18231d;--ink:#e8f0eb;--mut:#9fb1a6;--line:#2a3a32;--pri:#4fb783;--pri2:#1f3329;--warnbg:#3a2c12;--hl:#5b4d10}}
-:root[data-theme=dark]{--bg:#0f1713;--card:#18231d;--ink:#e8f0eb;--mut:#9fb1a6;--line:#2a3a32;--pri:#4fb783;--pri2:#1f3329;--warnbg:#3a2c12;--hl:#5b4d10}
+:root{--bg:#f4f7f5;--card:#fff;--ink:#16231c;--mut:#5d6b63;--line:#dfe7e2;--pri:#14633b;--pri2:#e6f2ea;--gold:#c8991c;--gold2:#fff6d9;--shadow:0 1px 2px rgba(10,40,25,.06),0 6px 18px rgba(10,40,25,.07);--warn:#b26a00;--warnbg:#fff3df;--ok:#1b8a4f;--bad:#b3261e;--hl:#fff1a8}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0f1713;--card:#18231d;--ink:#e8f0eb;--mut:#9fb1a6;--line:#2a3a32;--pri:#4fb783;--pri2:#1f3329;--warnbg:#3a2c12;--hl:#5b4d10;--gold2:#2e2711;--shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25)}}
+:root[data-theme=dark]{--bg:#0f1713;--card:#18231d;--ink:#e8f0eb;--mut:#9fb1a6;--line:#2a3a32;--pri:#4fb783;--pri2:#1f3329;--warnbg:#3a2c12;--hl:#5b4d10;--gold2:#2e2711;--shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;padding-bottom:84px}
-header{background:var(--pri);color:#fff;padding:14px 16px calc(14px);position:sticky;top:0;z-index:5}
-:root[data-theme=dark] header,:root:not([data-theme=light]) header{}
-@media (prefers-color-scheme:dark){:root:not([data-theme=light]) header{background:#16402b}}
-header h1{margin:0;font-size:18px;font-weight:700}
+header{background:linear-gradient(135deg,#0b3f27 0%,#14633b 55%,#1d8a57 100%);color:#fff;padding:max(12px,env(safe-area-inset-top)) 16px 0;position:relative;z-index:5;box-shadow:0 4px 16px rgba(5,30,18,.25);overflow:hidden}
+header:before{content:"";position:absolute;inset:0;opacity:.09;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cpath d='M24 4l5 11 11-5-5 11 11 5-11 5 5 11-11-5-5 11-5-11-11 5 5-11-11-5 11-5-5-11 11 5z' fill='none' stroke='white' stroke-width='1.2'/%3E%3C/svg%3E");pointer-events:none}
+.hrow{position:relative;display:flex;align-items:center;gap:12px;max-width:640px;margin:0 auto}
+.hrow svg{width:46px;height:46px;flex:none;filter:drop-shadow(0 3px 6px rgba(0,0,0,.35))}
+header h1{margin:0;font-size:22px;font-weight:700;font-family:"Amiri",Georgia,serif;letter-spacing:.2px;line-height:1.1}
+header h1 small{font-weight:400;font-size:15px;color:#ffe08a;margin-left:6px}
 header .sub{font-size:13px;opacity:.9}
+.tip{position:relative;max-width:640px;margin:10px auto 0;padding:7px 0 9px;font-size:12.5px;line-height:1.35;border-top:1px solid rgba(255,255,255,.18);color:#eaf6ee}
+.tip a{color:#ffe08a;font-weight:700;text-decoration:none;border-bottom:1px dotted #ffe08a;white-space:nowrap}
 main{max-width:640px;margin:0 auto;padding:12px 16px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:0 0 12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin:0 0 14px;box-shadow:var(--shadow)}
+.card.lesson{border-left:5px solid var(--gold);background:linear-gradient(180deg,var(--gold2),var(--card) 55%)}
+.card.done{background:linear-gradient(135deg,var(--pri2),var(--card));border-color:var(--ok)}
 .card h2{margin:0 0 4px;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);font-weight:700}
 .card h3{margin:0 0 6px;font-size:16px}
 .big{font-size:20px;font-weight:700;line-height:1.3}
@@ -32,25 +38,30 @@ main{max-width:640px;margin:0 auto;padding:12px 16px}
 .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .grow{flex:1}
 button,.btn{font:inherit;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 14px;border-radius:10px;cursor:pointer}
-button.pri{background:var(--pri);color:#fff;border-color:var(--pri)}
+button.pri{background:linear-gradient(135deg,#0f5a35,#1d8a57);color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(20,99,59,.35);font-weight:700}
+button{transition:transform .08s,background .15s}button:active{transform:scale(.97)}
 :root[data-theme=dark] button.pri,@media (prefers-color-scheme:dark){}
 button.sm{padding:5px 10px;font-size:14px}
 button:disabled{opacity:.5}
-.tick{display:flex;align-items:center;gap:12px;padding:10px 12px;border:2px solid var(--line);border-radius:12px;background:var(--card);width:100%;text-align:left;font-size:16px}
+.tick{transition:background .2s,border-color .2s;display:flex;align-items:center;gap:12px;padding:10px 12px;border:2px solid var(--line);border-radius:12px;background:var(--card);width:100%;text-align:left;font-size:16px}
 .tick .box{width:28px;height:28px;border:2px solid var(--mut);border-radius:8px;display:grid;place-items:center;font-size:18px;flex:none;color:#fff}
 .tick.on{border-color:var(--ok);background:var(--pri2)}
-.tick.on .box{background:var(--ok);border-color:var(--ok)}
-.tag{display:inline-block;padding:2px 9px;border-radius:99px;background:var(--pri2);color:var(--pri);font-size:12px;font-weight:700}
+.tick.on .box{background:var(--ok);border-color:var(--ok);animation:pop .25s}
+@keyframes pop{0%{transform:scale(.6)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+.tag{display:inline-block;padding:3px 10px;border-radius:99px;background:var(--pri2);color:var(--pri);font-size:12px;font-weight:700}
 .tag.warn{background:var(--warnbg);color:var(--warn)}
 .arabic{font-family:"Amiri","Scheherazade New","Traditional Arabic",serif;font-size:28px;line-height:2.2;direction:rtl;text-align:right}
 .arabic .hl{background:var(--hl);border-radius:6px}
 .arabic .num{font-size:20px;color:var(--pri);margin:0 4px}
-nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);display:flex;z-index:6;padding-bottom:env(safe-area-inset-bottom)}
+nav{position:fixed;bottom:0;left:0;right:0;background:color-mix(in srgb,var(--card) 92%,transparent);backdrop-filter:blur(12px);border-top:1px solid var(--line);box-shadow:0 -6px 20px rgba(10,40,25,.08);display:flex;z-index:6;padding-bottom:env(safe-area-inset-bottom)}
 nav button{flex:1;border:0;border-radius:0;background:none;padding:10px 2px 8px;font-size:12px;color:var(--mut)}
 nav button .ic{display:block;font-size:20px;line-height:1.1}
 nav button.on{color:var(--pri);font-weight:700}
+nav button.on .ic{transform:translateY(-2px) scale(1.15)}nav button .ic{transition:transform .15s}
 label{display:block;font-size:14px;color:var(--mut);margin:10px 0 4px}
 input[type=text],input[type=number],input[type=date],select,textarea{font:inherit;width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
+.ring{--p:0;width:64px;height:64px;border-radius:50%;background:conic-gradient(var(--gold) calc(var(--p)*1%),var(--pri2) 0);display:grid;place-items:center;flex:none}.ring i{width:48px;height:48px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-style:normal;font-weight:700;font-size:15px}
+.hello{display:flex;align-items:center;gap:14px}
 .bar{height:12px;background:var(--pri2);border-radius:99px;overflow:hidden}
 .bar i{display:block;height:100%;background:var(--pri)}
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -71,7 +82,13 @@ input[type=text],input[type=number],input[type=date],select,textarea{font:inheri
 </style>
 </head>
 <body>
-<header><h1>Hifz Planner</h1><div class="sub" id="sub"></div></header>
+<header><div class="hrow"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs>
+<linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0c4026"/><stop offset="1" stop-color="#23925b"/></linearGradient>
+<linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe08a"/><stop offset="1" stop-color="#c8991c"/></linearGradient>
+<mask id="cm"><rect width="512" height="512" fill="#fff"/><circle cx="286" cy="236" r="52" fill="#000"/></mask>
+</defs>
+<rect width="512" height="512" rx="112" fill="url(#g1)"/><circle cx="256" cy="256" r="236" fill="none" stroke="#fff" stroke-opacity=".12" stroke-width="3"/><g transform="translate(256 256)"><rect x="-150" y="-150" width="300" height="300" rx="14" fill="url(#g2)"/><rect x="-150" y="-150" width="300" height="300" rx="14" fill="url(#g2)" transform="rotate(45)"/><circle r="112" fill="#0c3d25"/><circle r="112" fill="none" stroke="#ffe9a8" stroke-width="5" opacity=".7"/></g><circle cx="256" cy="256" r="58" fill="url(#g2)" mask="url(#cm)" transform="translate(-6 8)"/><path d="M322 176l7 16 17 2-13 11 4 17-15-9-15 9 4-17-13-11 17-2z" fill="#fff" transform="translate(-10 -4) scale(.9)"/></svg><div><h1>Hifz Planner<small>حفظ</small></h1><div class="sub" id="sub"></div></div></div>
+<div class="tip">📖 Tip: for reading and listening, we recommend the <b>Al Quran (Tafsir &amp; by Word)</b> app: <a href="https://apps.apple.com/us/app/al-quran-tafsir-by-word/id1437038111" target="_blank" rel="noopener">iPhone</a> · <a href="https://play.google.com/store/apps/details?id=com.greentech.quran" target="_blank" rel="noopener">Android</a></div></header>
 <main id="app"></main>
 <nav id="nav"></nav>
 <script>
@@ -255,7 +272,8 @@ function viewToday(){
     h+=revCards(c,true);return h}
   if(!c.lesson&&!c.commit){h+=`<div class="card"><div class="big">Alhamdulillah 🎉</div><p>No more lessons left in your plan. Keep revising.</p></div>`+revCards(c,false);return h}
   const l=c.lesson;
-  h+=`<div class="card"><h2>Today · ${esc(fmtDate(t))}</h2><div class="row"><span class="tag">New lesson</span><span class="mut">about 12 min</span>${l.phase===2?'<span class="tag">pace 2</span>':''}</div>
+  const dn=(c.ticks.new?1:0)+(c.ticks.sabqi?1:0)+(c.ticks.manzil?1:0);
+  h+=`<div class="card lesson"><div class="hello"><div class="grow"><h2>Today · ${esc(fmtDate(t))}</h2><div class="mut">${dn===3?'All done. Jazakallah khairan!':dn+' of 3 done'}</div></div><div class="ring" style="--p:${Math.round(dn/3*100)}"><i>${dn}/3</i></div></div><div class="row" style="margin-top:8px"><span class="tag">New lesson</span><span class="mut">about 12 min</span>${l.phase===2?'<span class="tag">pace 2</span>':''}</div>
   <div class="big" style="margin:8px 0">${esc(labelOf(l))}</div>
   <div class="mut">${l.words} words · learn: listen 3× → read 10× → recite 10× from memory → link to the previous lesson.</div>
   <div class="row" style="margin-top:10px"><button data-a="text">Show text</button><button data-a="play">▶ Listen</button><select id="reps" style="width:auto"><option>1</option><option selected>3</option><option>5</option><option>10</option></select><span class="mut">times</span><button data-a="stop" class="sm">Stop</button></div>
@@ -263,7 +281,7 @@ function viewToday(){
   <div style="margin-top:10px">${tickBtn('new','I learned today’s new lesson',c.ticks.new)}</div></div>`;
   h+=revCards(c,false);
   const done=c.ticks.new&&c.ticks.sabqi&&c.ticks.manzil;
-  if(done)h+=`<div class="card" style="border-color:var(--ok)"><div class="big">✅ Today is done. Jazakallah khairan.</div><p class="mut">Tomorrow morning, recite today’s lesson from memory BEFORE looking. If you stumble, repeat it instead of moving on.</p><button data-a="extra">Learn another lesson today</button></div>`;
+  if(done)h+=`<div class="card done"><div class="big">✅ Today is done. Jazakallah khairan.</div><p class="mut">Tomorrow morning, recite today’s lesson from memory BEFORE looking. If you stumble, repeat it instead of moving on.</p><button data-a="extra">Learn another lesson today</button></div>`;
   if(p.all.length>1){h+=`<div class="card"><h2>Coming up</h2>`+p.all.slice(c.commit?0:1,(c.commit?0:1)+3).map((x,i)=>{const di=(c.commit?0:1)+i;return `<div class="list-item"><div class="grow">${esc(labelOf(x))}</div><div class="mut">${esc(p.dates[di].toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short'}))}</div></div>`}).join('')+`</div>`}
   return h}
 function tickBtn(k,label,on){return `<button class="tick ${on?'on':''}" data-a="tick" data-k="${k}"><span class="box">${on?'✓':''}</span><span>${label}</span></button>`}
